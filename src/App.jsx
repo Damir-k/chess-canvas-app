@@ -5,10 +5,10 @@ import './App.css';
 import { TaskList } from './pages/TaskList';
 
 const initializeAssistant = (getState /*: any*/, getRecoveryState) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.NODE_ENV === 'development' || true) {
     return createSmartappDebugger({
-      token: process.env.REACT_APP_TOKEN ?? '',
-      initPhrase: `Запусти ${process.env.REACT_APP_SMARTAPP}`,
+      token: import.meta.env.VITE_APP_TOKEN ?? '',
+      initPhrase: `Запусти ${import.meta.env.VITE_APP_SMARTAPP}`,
       getState,                                           
       // getRecoveryState: getState,                                           
       nativePanel: {
