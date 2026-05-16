@@ -23,6 +23,20 @@ const initializeAssistant = (getState /*: any*/, getRecoveryState) => {
   }
 };
 
+const initializeChessMatch = (fen=DEFAULT_POSITION) => {
+  let chess = new Chess(fen)
+  let today = new Date()
+
+  chess.setHeader('Event', 'Онлайн игра')
+  chess.setHeader('Site', 'SmartApp приложение Салют')
+  chess.setHeader('Date', `${today.getFullYear()}.${today.getMonth()}.${today.getDate()}`)
+  chess.setHeader('Round', '-')
+  chess.setHeader('White', 'Пользователь')
+  chess.setHeader('Black', 'Салют')
+
+  return chess;
+}
+
 export class App extends React.Component {
   constructor(props) {
     super(props);
@@ -30,7 +44,7 @@ export class App extends React.Component {
 
     this.state = {
       notes: [{ id: Math.random().toString(36).substring(7), title: 'тест', completed: false }],
-      chess: new Chess(DEFAULT_POSITION)
+      chess: initializeChessMatch()
     };
 
     this.assistant = initializeAssistant(() => this.getStateForAssistant());
@@ -177,8 +191,9 @@ export class App extends React.Component {
   }
 
   make_move(move) {
-    console.log("make_move:", move)
-    const newChess = new Chess(this.state.chess.fen())
+    // console.log("make_move:", move)
+    const newChess = initializeChessMatch(this.state.chess.fen())
+    newChess.loadPgn(this.state.chess.pgn())
 
     try {
       newChess.move(move);
@@ -201,20 +216,20 @@ export class App extends React.Component {
     return (
       <>
         <TaskList
-          items={this.state.notes}
-          onAdd={(note) => {
-            this.add_note({ type: 'add_note', note });
-          }}
-          onDone={(note) => {
-            this.play_done_note(note.id);
-            this.done_note({ type: 'done_note', id: note.id });
-          }}
-          onDelete={(note) => {
-            this.delete_note({ type: 'delete_note', id: note.id})
-          }}
-          onDeleteAll={() => {
-            this.delete_all_notes({ type: 'delete_all_notes'})
-          }}
+          // items={this.state.notes}
+          // onAdd={(note) => {
+          //   this.add_note({ type: 'add_note', note });
+          // }}
+          // onDone={(note) => {
+          //   this.play_done_note(note.id);
+          //   this.done_note({ type: 'done_note', id: note.id });
+          // }}
+          // onDelete={(note) => {
+          //   this.delete_note({ type: 'delete_note', id: note.id})
+          // }}
+          // onDeleteAll={() => {
+          //   this.delete_all_notes({ type: 'delete_all_notes'})
+          // }}
           onMoveMade={(move) => {
             return this.make_move(move)
           }}

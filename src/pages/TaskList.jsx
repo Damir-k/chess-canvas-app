@@ -9,7 +9,7 @@ export const TaskList = (props) => {
   const { items, onAdd, onDone, onDelete, onDeleteAll, onMoveMade, chess } = props;
   return (
     <main className="container">
-      <AddTask
+      {/* <AddTask
         onAdd = { onAdd }
       />
       <DeleteAll
@@ -19,7 +19,7 @@ export const TaskList = (props) => {
         items  = { items }
         onDone = { onDone }
         onDelete = { onDelete }
-      />
+      /> */}
       <MakeMove
         chess = { chess }
         onMoveMade = { onMoveMade }
