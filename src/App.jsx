@@ -37,6 +37,17 @@ const initializeChessMatch = (fen=DEFAULT_POSITION) => {
   return chess;
 }
 
+async function postChessApi(data = {}) {
+    const response = await fetch("https://chess-api.com/v1", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data),
+    });
+    return response.json();
+}
+
 export class App extends React.Component {
   constructor(props) {
     super(props);
@@ -183,15 +194,23 @@ export class App extends React.Component {
     }
 
     if (newChess.isGameOver()) {
-      this.show_result(newChess)
+      setTimeout(() => this.show_result(newChess), 1000)
       return true
     }
 
     if (newChess.turn() === 'b') {
-      let blackMoves = newChess.moves()
-      let randomMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
-      setTimeout(() => this.make_move(randomMove), 500)
-      console.log("black's turn is going to be: ", randomMove)
+      // let blackMoves = newChess.moves()
+      // let responseMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
+      // console.log("black's turn is going to be: ", responseMove)
+      // setTimeout(() => this.make_move(responseMove), 500)
+      let previous_moves = newChess.history().join(' ')
+      console.log(previous_moves)
+
+      postChessApi({ input: previous_moves }).then((data) => {
+        console.log(data)
+        setTimeout(() => this.make_move(data.san), 500)
+      })
+
     }
     return true
     // console.log(newChess.ascii())
