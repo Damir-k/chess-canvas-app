@@ -8,6 +8,7 @@ body {
   padding: 0 48px;
 }
 
+.make-move,
 .add-task,
 .task-item,
 .delete-all {
@@ -21,6 +22,7 @@ body {
   color: #ffffff;
 }
 
+.make-move,
 .add-task,
 .delete-all {
   margin-top: 48px;
@@ -30,7 +32,7 @@ body {
   border: none;
   border-radius: 64px;
 }
-
+.make-move::placeholder,
 .add-task::placeholder {
   color: rgba(255, 255, 255, 0.56);
 }
@@ -63,6 +65,7 @@ body {
   display: block;
 }
 
+.make-move:hover,
 .add-task:hover,
 .delete-all:hover {
   outline: auto;

@@ -9,6 +9,7 @@ export default defineConfig({
     outDir: 'dist',  // Vite builds to 'dist' instead of 'build'
   },
   server: {
-    port: 3000
+    port: 3000,
+    hmr: false
   }
 })

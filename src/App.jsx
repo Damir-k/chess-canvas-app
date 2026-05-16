@@ -3,6 +3,7 @@ import { createAssistant, createSmartappDebugger } from '@salutejs/client';
 
 import './App.css';
 import { TaskList } from './pages/TaskList';
+import { Chess, DEFAULT_POSITION } from 'chess.js'
 
 const initializeAssistant = (getState /*: any*/, getRecoveryState) => {
   if (import.meta.env.NODE_ENV === 'development' || true) {
@@ -29,6 +30,7 @@ export class App extends React.Component {
 
     this.state = {
       notes: [{ id: Math.random().toString(36).substring(7), title: 'тест', completed: false }],
+      chess: new Chess(DEFAULT_POSITION)
     };
 
     this.assistant = initializeAssistant(() => this.getStateForAssistant());
@@ -192,6 +194,9 @@ export class App extends React.Component {
           }}
           onDeleteAll={() => {
             this.delete_all_notes({ type: 'delete_all_notes'})
+          }}
+          onMoveMade={(move) => {
+            console.log("Made a move: ", move)
           }}
         />
       </>
