@@ -179,14 +179,19 @@ export class App extends React.Component {
   make_move(move) {
     console.log("make_move:", move)
     const newChess = new Chess(this.state.chess.fen())
-    if (newChess.turn() === 'b') return false
-    
+
     try {
       newChess.move(move);
     } catch {
       return false
     }
     this.setState({ chess: newChess })
+    if (newChess.turn() === 'b') {
+      let blackMoves = newChess.moves()
+      let blackMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
+      setTimeout(() => this.make_move(blackMove), 2000)
+      console.log("black's turn is going to be: ", blackMove)
+    }
     return true
     // console.log(newChess.ascii())
   }

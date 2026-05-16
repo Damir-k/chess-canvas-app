@@ -13,13 +13,17 @@ export class MakeMove extends React.Component {
   }
 
   render () {
-    const { onMoveMade } = this.props;
+    const { onMoveMade, chess } = this.props;
 
     return (
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          onMoveMade(this.state.move) || alert("Invalid move!")
+          if (chess.turn() === 'w') {
+            onMoveMade(this.state.move) || alert("Неверный ход!")
+          } else {
+            alert("Подождите вашего хода")
+          }
           this.setState({
             move: '',
           })

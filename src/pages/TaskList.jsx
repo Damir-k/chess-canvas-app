@@ -21,6 +21,7 @@ export const TaskList = (props) => {
         onDelete = { onDelete }
       />
       <MakeMove
+        chess = { chess }
         onMoveMade = { onMoveMade }
       />
       <ChessboardComponent 
