@@ -11,8 +11,7 @@ export const ChessboardComponent = (props) => {
       sourceSquare,
       targetSquare
     }) {
-      console.log("onPieceDrop")
-        // type narrow targetSquare potentially being null (e.g. if dropped off board)
+      // type narrow targetSquare potentially being null (e.g. if dropped off board)
       if (!targetSquare || chess.turn() === 'b') {
         return false;
       }

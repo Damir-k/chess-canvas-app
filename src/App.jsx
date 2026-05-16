@@ -80,10 +80,6 @@ export class App extends React.Component {
     });
   }
 
-  componentDidMount() {
-    console.log('componentDidMount');
-  }
-
   getStateForAssistant() {
     console.log('getStateForAssistant: this.state:', this.state);
     const state = {
@@ -126,29 +122,6 @@ export class App extends React.Component {
     }
   }
 
-  add_note(action) {
-    console.log('add_note', action);
-    this.setState({
-      notes: [
-        ...this.state.notes,
-        {
-          id: Math.random().toString(36).substring(7),
-          title: action.note,
-          completed: false,
-        },
-      ],
-    });
-  }
-
-  done_note(action) {
-    console.log('done_note', action);
-    this.setState({
-      notes: this.state.notes.map((note) =>
-        note.id === action.id ? { ...note, completed: !note.completed } : note
-      ),
-    });
-  }
-
   _send_action_value(action_id, value) {
     const data = {
       action: {
@@ -176,20 +149,6 @@ export class App extends React.Component {
     }
   }
 
-  delete_note(action) {
-    console.log('delete_note', action);
-    this.setState({
-      notes: this.state.notes.filter(({ id }) => id !== action.id),
-    });
-  }
-
-  delete_all_notes(action) {
-    console.log('delete_all_notes', action);
-    this.setState({
-      notes: []
-    });
-  }
-
   // When modifying Chess object in any way, create a new clone first so React notices
   update_chess() {
     const newChess = initializeChessMatch(this.state.chess.fen())
@@ -208,9 +167,9 @@ export class App extends React.Component {
     }
     if (newChess.turn() === 'b') {
       let blackMoves = newChess.moves()
-      let blackMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
-      setTimeout(() => this.make_move(blackMove), 2000)
-      console.log("black's turn is going to be: ", blackMove)
+      let randomMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
+      setTimeout(() => this.make_move(randomMove), 2000)
+      console.log("black's turn is going to be: ", randomMove)
     }
     return true
     // console.log(newChess.ascii())
@@ -218,15 +177,18 @@ export class App extends React.Component {
 
   take_back() {
     const newChess = this.update_chess()
-
     try {
       newChess.undo()
       newChess.undo()
     } catch {
       return false
     }
-
     return true
+  }
+
+  reset_game() {
+    const newChess = initializeChessMatch()
+    this.setState({ chess: newChess })
   }
 
   render() {
@@ -234,26 +196,15 @@ export class App extends React.Component {
     return (
       <>
         <Game
-          // items={this.state.notes}
-          // onAdd={(note) => {
-          //   this.add_note({ type: 'add_note', note });
-          // }}
-          // onDone={(note) => {
-          //   this.play_done_note(note.id);
-          //   this.done_note({ type: 'done_note', id: note.id });
-          // }}
-          // onDelete={(note) => {
-          //   this.delete_note({ type: 'delete_note', id: note.id})
-          // }}
-          // onDeleteAll={() => {
-          //   this.delete_all_notes({ type: 'delete_all_notes'})
-          // }}
+          chess={this.state.chess}
           onMoveMade={(move) => {
             return this.make_move(move)
           }}
-          chess={this.state.chess}
           onUndoMove={() => {
             return this.take_back()
+          }}
+          onGameReset={() => {
+            return this.reset_game()
           }}
         />
       </>

@@ -5,9 +5,10 @@ import {TaskItemList} from '../components/TaskItemList';
 import {MakeMove} from '../components/MakeMove'
 import { ChessboardComponent } from '../components/Chessboard';
 import { UndoMove } from '../components/UndoMove';
+import { ResetGame } from '../components/ResetGame';
 
 export const Game = (props) => {
-  const { items, onAdd, onDone, onDelete, onDeleteAll, onMoveMade, chess, onUndoMove } = props;
+  const { items, onAdd, onDone, onDelete, onDeleteAll, onMoveMade, chess, onUndoMove, onGameReset } = props;
   return (
     <main className="container">
       {/* <AddTask
@@ -28,6 +29,10 @@ export const Game = (props) => {
       <UndoMove
         chess = {chess}
         onUndoMove = { onUndoMove }
+      />
+      <ResetGame
+        chess = {chess}
+        onGameReset = { onGameReset }
       />
       <ChessboardComponent 
         chess = { chess }
