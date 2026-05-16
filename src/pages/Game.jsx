@@ -4,9 +4,10 @@ import {DeleteAll} from '../components/DeleteAll';
 import {TaskItemList} from '../components/TaskItemList';
 import {MakeMove} from '../components/MakeMove'
 import { ChessboardComponent } from '../components/Chessboard';
+import { UndoMove } from '../components/UndoMove';
 
-export const TaskList = (props) => {
-  const { items, onAdd, onDone, onDelete, onDeleteAll, onMoveMade, chess } = props;
+export const Game = (props) => {
+  const { items, onAdd, onDone, onDelete, onDeleteAll, onMoveMade, chess, onUndoMove } = props;
   return (
     <main className="container">
       {/* <AddTask
@@ -23,6 +24,10 @@ export const TaskList = (props) => {
       <MakeMove
         chess = { chess }
         onMoveMade = { onMoveMade }
+      />
+      <UndoMove
+        chess = {chess}
+        onUndoMove = { onUndoMove }
       />
       <ChessboardComponent 
         chess = { chess }

@@ -2,7 +2,7 @@ import React from 'react';
 import { createAssistant, createSmartappDebugger } from '@salutejs/client';
 
 import './App.css';
-import { TaskList } from './pages/TaskList';
+import { Game } from './pages/Game';
 import { Chess, DEFAULT_POSITION } from 'chess.js'
 
 const initializeAssistant = (getState /*: any*/, getRecoveryState) => {
@@ -190,17 +190,22 @@ export class App extends React.Component {
     });
   }
 
-  make_move(move) {
-    // console.log("make_move:", move)
+  // When modifying Chess object in any way, create a new clone first so React notices
+  update_chess() {
     const newChess = initializeChessMatch(this.state.chess.fen())
     newChess.loadPgn(this.state.chess.pgn())
+    this.setState({ chess: newChess })
+    return newChess
+  }
+
+  make_move(move) {
+    const newChess = this.update_chess()
 
     try {
       newChess.move(move);
     } catch {
       return false
     }
-    this.setState({ chess: newChess })
     if (newChess.turn() === 'b') {
       let blackMoves = newChess.moves()
       let blackMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
@@ -211,11 +216,24 @@ export class App extends React.Component {
     // console.log(newChess.ascii())
   }
 
+  take_back() {
+    const newChess = this.update_chess()
+
+    try {
+      newChess.undo()
+      newChess.undo()
+    } catch {
+      return false
+    }
+
+    return true
+  }
+
   render() {
     console.log('render');
     return (
       <>
-        <TaskList
+        <Game
           // items={this.state.notes}
           // onAdd={(note) => {
           //   this.add_note({ type: 'add_note', note });
@@ -234,6 +252,9 @@ export class App extends React.Component {
             return this.make_move(move)
           }}
           chess={this.state.chess}
+          onUndoMove={() => {
+            return this.take_back()
+          }}
         />
       </>
     );
