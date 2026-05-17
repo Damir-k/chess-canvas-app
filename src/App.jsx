@@ -176,52 +176,21 @@ export class App extends React.Component {
     const { parseTree, piece, file, rank } = move;
     // console.log("make_move: ", parseTree)
     console.info("Piece:", piece, "file:", file, "rank:", rank)
-    const file_dictionary = {
-      "a": "a",
-      "а": "a",
-      "b": "b",
-      "б": "b",
-      "бэ": "b",
-      "би": "b",
-      "ц": "c",
-      "це": "c",
-      "цэ": "c",
-      "си": "c",
-      "c": "c",
-      "d": "d",
-      "д": "d",
-      "дэ": "d",
-      "ди": "d",
-      "e": "e",
-      "е": "e",
-      "и": "e",
-      "f": "f",
-      "эф": "f",
-      "ф": "f",
-      "фэ": "f",
-      "g": "g",
-      "джи": "g",
-      "дже": "g",
-      "жи": "g",
-      "же": "g",
-      "ж": "g",
-      "г": "g",
-      "гэ": "g",
-      "h": "h",
-      "х": "h",
-      "ха": "h",
-      "хэ": "h",
-      "эйч": "h",
-      "аш": "h",
-      "ш": "h",
-      
-    }
 
-    if (piece === undefined) {
-      const parsedMove = file_dictionary[file.toLowerCase()] + rank
-      console.info("Parsed move:", parsedMove)
-      this.make_move(parsedMove) || console.warn(parsedMove, "failed")
+    let targetSquare = file + rank
+    if (piece === undefined || piece === 'Пешка') { // ход пешкой вперёд
+      console.info("Ход пешкой вперёд:", targetSquare)
+      return this.make_move(targetSquare) || console.warn(targetSquare, "failed")
     }
+    let attackingPiece;
+    if (piece === 'Конь') attackingPiece = 'N';
+    if (piece === 'Король') attackingPiece = 'K';
+    if (piece === 'Слон') attackingPiece = 'B';
+    if (piece === 'Ладья') attackingPiece = 'R';
+    if (piece === 'Ферзь') attackingPiece = 'Q';
+
+    const parsedMove = attackingPiece + targetSquare
+    return this.make_move(parsedMove) || console.warn(parsedMove, "failed")
   }
 
   say_phrase(phrase) {
