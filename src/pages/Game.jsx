@@ -15,6 +15,7 @@ export const Game = (props) => {
         chess = { chess }
         onMoveMade = { onMoveMade }
       />
+      <div className='buttons'>
       <UndoMove
         chess = { chess }
         onUndoMove = { onUndoMove }
@@ -23,6 +24,7 @@ export const Game = (props) => {
         chess = { chess }
         onGameReset = { onGameReset }
       />
+      </div>
       <ChessboardComponent 
         chess = { chess }
         onMoveMade = { onMoveMade }

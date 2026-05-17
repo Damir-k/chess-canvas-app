@@ -8,10 +8,7 @@ body {
   padding: 0 48px;
 }
 
-.make-move,
-.add-task,
-.task-item,
-.delete-all {
+.make-move {
   background-color: rgba(255, 255, 255, 0.24);
   padding: 16px 32px;
   font-weight: 500;
@@ -23,12 +20,10 @@ body {
 }
 
 #main-board {
-  margin: 48px auto 128px auto;
+  margin: 0 auto 144px auto;
 }
 
-.make-move,
-.add-task,
-.delete-all {
+.make-move {
   margin-top: 48px;
   width: 100%;
   height: 72px;
@@ -36,45 +31,40 @@ body {
   border: none;
   border-radius: 64px;
 }
-.make-move::placeholder,
-.add-task::placeholder {
+
+.make-move::placeholder {
   color: rgba(255, 255, 255, 0.56);
 }
 
-.notes {
-  margin: 36px 0 144px;
-  padding: 0;
-  list-style: none;
-}
-
-.task-item {
-  margin-bottom: 24px;
-  border-radius: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.done-item,
-.delete-item {
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-}
-
-.delete-all {
-  width: 50%;
+.control-button {
+  width: 15%;
+  height: 48px;
   border-radius: 20px;
-  margin: 24px auto;
-  display: block;
+  border: none;
+  margin: 24px 10px;
+  display: inline-block;
+  font-weight: bold;
+  font-style: normal;
+  background:rgb(100,100,100);
+  color: rgb(200,200,200);
 }
 
 .make-move:hover,
-.add-task:hover,
-.delete-all:hover {
-  outline: auto;
+.control-button:hover {
+  outline: 3px solid white;
 }
 
-.delete-all:active {
+.control-button:disabled {
+  background-color: #292929;
+  outline: 0;
+}
+
+.buttons {
+  display:flex;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+.control-button:active {
   background-color: rgba(255, 255, 255, 0.44);
 }
