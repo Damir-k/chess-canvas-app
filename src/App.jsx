@@ -51,7 +51,7 @@ async function postChessApi(data = {}) {
 export class App extends React.Component {
   constructor(props) {
     super(props);
-    console.log('constructor');
+    // console.log('constructor');
 
     this.state = {
       notes: [{ id: Math.random().toString(36).substring(7), title: 'тест', completed: false }],
@@ -61,11 +61,11 @@ export class App extends React.Component {
     this.assistant = initializeAssistant(() => this.getStateForAssistant());
 
     this.assistant.on('data', (event /*: any*/) => {
-      console.log(`assistant.on(data)`, event);
+      // console.log(`assistant.on(data)`, event);
       if (event.type === 'character') {
-        console.log(`assistant.on(data): character: "${event?.character?.id}"`);
+        // console.log(`assistant.on(data): character: "${event?.character?.id}"`);
       } else if (event.type === 'insets') {
-        console.log(`assistant.on(data): insets`);
+        // console.log(`assistant.on(data): insets`);
       } else {
         const { action } = event;
         this.dispatchAssistantAction(action);
@@ -75,11 +75,11 @@ export class App extends React.Component {
     this.assistant.on('start', (event) => {
       let initialData = this.assistant.getInitialData();
 
-      console.log(`assistant.on(start)`, event, initialData);
+      // console.log(`assistant.on(start)`, event, initialData);
     });
 
     this.assistant.on('command', (event) => {
-      console.log(`assistant.on(command)`, event);
+      // console.log(`assistant.on(command)`, event);
     });
 
     this.assistant.on('error', (event) => {
@@ -87,12 +87,12 @@ export class App extends React.Component {
     });
 
     this.assistant.on('tts', (event) => {
-      console.log(`assistant.on(tts)`, event);
+      // console.log(`assistant.on(tts)`, event);
     });
   }
 
   getStateForAssistant() {
-    console.log('getStateForAssistant: this.state:', this.state);
+    // console.log('getStateForAssistant: this.state:', this.state);
     const state = {
       item_selector: {
         items: this.state.notes.map(({ id, title }, index) => ({
@@ -108,31 +108,23 @@ export class App extends React.Component {
       },
       fen: this.state.chess.fen()
     };
-    console.log('getStateForAssistant: state:', state);
+    // console.log('getStateForAssistant: state:', state);
     return state;
   }
 
   dispatchAssistantAction(action) {
-    console.log('dispatchAssistantAction', action);
+    // console.log('dispatchAssistantAction', action);
     if (action) {
       switch (action.type) {
         case 'reset_game':
           return this.reset_game()
         
         case 'undo_move':
-          if(this.take_back()) {
-            this.say_phrase("Возвращаю Ваш ход.")
-          } else {
-            setTimeout(() => {
-              if(this.take_back()) {
-                this.say_phrase("Возвращаю Ваш ход.")
-              } else {
-                this.say_phrase("Вернуть ход не получилось.")
-              }  
-            }, 500)
-          }
-          break;
+          return this.handle_undo_move_attempt()
 
+        case 'make_move':
+          return this.handle_make_move_attempt(action.move)
+        
         default:
           console.error("unknown action type:", action.type)
       }
@@ -163,6 +155,72 @@ export class App extends React.Component {
       const texts = ['Молодец!', 'Красавица!', 'Супер!'];
       const idx = Math.floor(Math.random() * texts.length);
       this._send_action_value('done', texts[idx]);
+    }
+  }
+
+  handle_undo_move_attempt() {
+    if(this.take_back()) {
+      this.say_phrase("Возвращаю Ваш ход.")
+    } else {
+      setTimeout(() => {
+        if(this.take_back()) {
+          this.say_phrase("Возвращаю Ваш ход.")
+        } else {
+          this.say_phrase("Вернуть ход не получилось.")
+        }  
+      }, 500)
+    }
+  }
+
+  handle_make_move_attempt(move) {
+    const { parseTree, piece, file, rank } = move;
+    // console.log("make_move: ", parseTree)
+    console.info("Piece:", piece, "file:", file, "rank:", rank)
+    const file_dictionary = {
+      "a": "a",
+      "а": "a",
+      "b": "b",
+      "б": "b",
+      "бэ": "b",
+      "би": "b",
+      "ц": "c",
+      "це": "c",
+      "цэ": "c",
+      "си": "c",
+      "c": "c",
+      "d": "d",
+      "д": "d",
+      "дэ": "d",
+      "ди": "d",
+      "e": "e",
+      "е": "e",
+      "и": "e",
+      "f": "f",
+      "эф": "f",
+      "ф": "f",
+      "фэ": "f",
+      "g": "g",
+      "джи": "g",
+      "дже": "g",
+      "жи": "g",
+      "же": "g",
+      "ж": "g",
+      "г": "g",
+      "гэ": "g",
+      "h": "h",
+      "х": "h",
+      "ха": "h",
+      "хэ": "h",
+      "эйч": "h",
+      "аш": "h",
+      "ш": "h",
+      
+    }
+
+    if (piece === undefined) {
+      const parsedMove = file_dictionary[file.toLowerCase()] + rank
+      console.info("Parsed move:", parsedMove)
+      this.make_move(parsedMove) || console.warn(parsedMove, "failed")
     }
   }
 
@@ -209,17 +267,17 @@ export class App extends React.Component {
     }
 
     if (newChess.turn() === 'b') {
-      // let blackMoves = newChess.moves()
-      // let responseMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
-      // console.log("black's turn is going to be: ", responseMove)
-      // setTimeout(() => this.make_move(responseMove), 500)
-      let previous_moves = newChess.history().join(' ')
-      console.log(previous_moves)
+      let blackMoves = newChess.moves()
+      let responseMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
+      console.log("black's turn is going to be: ", responseMove)
+      setTimeout(() => this.make_move(responseMove), 500)
+      // let previous_moves = newChess.history().join(' ')
+      // console.log(previous_moves)
 
-      postChessApi({ input: previous_moves }).then((data) => {
-        console.log(data)
-        setTimeout(() => this.make_move(data.san), 500)
-      })
+      // postChessApi({ input: previous_moves }).then((data) => {
+      //   console.log(data)
+      //   setTimeout(() => this.make_move(data.san), 500)
+      // })
 
     }
     return true
@@ -237,7 +295,7 @@ export class App extends React.Component {
   }
 
   render() {
-    console.log('render');
+    // console.log('render');
     return (
       <>
         <Game
