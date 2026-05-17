@@ -124,7 +124,9 @@ export class App extends React.Component {
 
         case 'make_move':
           return this.handle_make_move_attempt(action.move)
-        
+        // НОВЫЙ e2e4 СВЕЖИЙ НЕРАЗДЕЛАННЫЙ 
+        case 'e2e4_move':
+          return this.handle_make_e2e4_attempt(action.move)
         default:
           console.error("unknown action type:", action.type)
       }
@@ -172,6 +174,28 @@ export class App extends React.Component {
     }
   }
 
+
+  // пишем обработчик для хода в формате e2-e4
+  handle_make_e2e4_attempt(move) {
+    // принимаем координаты "откуда" и "куда"
+    const { fileFrom, rankFrom, fileTo, rankTo } = move;
+  
+    // console.log("make_move: ", parseTree)
+    
+    console.info("FileFrom:", fileFrom, "RankFrom", rankFrom,
+       "FileTo", fileTo, "RankTo", rankTo)
+
+    let sourceSquare = fileFrom + rankFrom
+    let targetSquare = fileTo + rankTo
+
+    // Пример:
+    // "e2" + " -" + "e4"
+    const parsedMove = sourceSquare + '-' + targetSquare
+
+    return this.make_move(parsedMove) || console.warn(parsedMove, "failed")
+  }
+
+  
   handle_make_move_attempt(move) {
     const { parseTree, piece, file, rank } = move;
     // console.log("make_move: ", parseTree)
@@ -240,6 +264,7 @@ export class App extends React.Component {
       let responseMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
       console.log("black's turn is going to be: ", responseMove)
       setTimeout(() => this.make_move(responseMove), 500)
+
       // let previous_moves = newChess.history().join(' ')
       // console.log(previous_moves)
 
