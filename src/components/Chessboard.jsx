@@ -25,8 +25,8 @@ export const ChessboardComponent = (props) => {
       onPieceDrop: onPieceDrop,
       id: 'main',
       boardStyle: {
-        width: '60%',
-        height: '60%',
+        width: '100%',
+        height: '100%',
       }
     };
 

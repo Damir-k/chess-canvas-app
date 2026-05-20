@@ -32,7 +32,7 @@ export class MakeMove extends React.Component {
         <input
           className   = "make-move"
           type        = "text"
-          placeholder = "Make a move"
+          placeholder = "Сделайте ход"
           value       = { this.state.move }
           onChange    = {({ target: { value } }) => this.setState({
             move: value,

@@ -14,7 +14,7 @@ export class ResetGame extends React.Component {
             <input
             className="control-button"
             type="button"
-            value="Reset the game"
+            value="Сбросить игру"
             disabled={false}
             onClick={ (event) => onGameReset()}
             />

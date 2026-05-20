@@ -106,7 +106,7 @@ export class App extends React.Component {
       //     'выполни', 'выполнил', 'сделал' // выполнил|сделал
       //   ],
       // },
-      chess: this.state.chess,
+      chess: this.state.chess.fen(),
     };
     // console.log('getStateForAssistant: state:', state);
     return state;

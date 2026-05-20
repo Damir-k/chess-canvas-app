@@ -14,7 +14,7 @@ export class UndoMove extends React.Component {
             <input
             className="control-button"
             type="button"
-            value="Undo"
+            value="Вернуть ход"
             disabled={chess.turn() === 'b' || chess.moveNumber() === 1}
             onClick={ (event) => onUndoMove()}
             />
