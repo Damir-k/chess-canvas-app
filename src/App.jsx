@@ -4,6 +4,7 @@ import { createAssistant, createSmartappDebugger } from '@salutejs/client';
 import './App.css';
 import { Game } from './pages/Game';
 import { Chess, DEFAULT_POSITION } from 'chess.js'
+import { DifficultyModal } from './components/DifficultyModal';
 
 const initializeAssistant = (getState /*: any*/, getRecoveryState) => {
   if (import.meta.env.MODE === 'development') {
@@ -54,8 +55,12 @@ export class App extends React.Component {
     // console.log('constructor');
 
     this.state = {
-      // notes: [{ id: Math.random().toString(36).substring(7), title: 'тест', completed: false }],
-      chess: initializeChessMatch()
+      notes: [{ id: Math.random().toString(36).substring(7), title: 'тест', completed: false }],
+      chess: initializeChessMatch(),
+      // отображение окна выбора сложности (по ум. тру)
+      showDifficultyModal: true,
+      // сложность по умолчанию   
+      difficulty: 'medium',       
     };
 
     this.assistant = initializeAssistant(() => this.getStateForAssistant());
@@ -90,6 +95,19 @@ export class App extends React.Component {
       // console.log(`assistant.on(tts)`, event);
     });
   }
+
+  // Обработчик выбора сложности
+  handleDifficultySelect = (level) => {
+    console.log('Выбрана сложность:', level);
+    this.setState({ 
+      difficulty: level,
+      showDifficultyModal: false 
+    });
+    // сообщает выбранный уровень сложности 
+    // по значению переменной level
+    this.say_phrase(`Играем на ${level === 'easy' ? 'легком' : level === 'medium' ? 'среднем' : 'сложном'} уровне`);
+  }
+
 
   getStateForAssistant() {
     // console.log('getStateForAssistant: this.state:', this.state);
@@ -178,9 +196,9 @@ export class App extends React.Component {
   // пишем обработчик для хода в формате e2-e4
   handle_make_e2e4_attempt(move) {
     // принимаем координаты "откуда" и "куда"
-    const { fileFrom, rankFrom, fileTo, rankTo } = move;
+    const { parseTree, fileFrom, rankFrom, fileTo, rankTo } = move;
   
-    // console.log("make_move: ", parseTree)
+    console.log("make_move: ", parseTree)
     
     console.info("FileFrom:", fileFrom, "RankFrom", rankFrom,
        "FileTo", fileTo, "RankTo", rankTo)
@@ -292,7 +310,13 @@ export class App extends React.Component {
     // console.log('render');
     return (
       <>
-        <Game
+        <DifficultyModal 
+          isOpen={this.state.showDifficultyModal}
+          onSelect={this.handleDifficultySelect}
+        />
+        
+        {!this.state.showDifficultyModal && (
+          <Game
           chess={this.state.chess}
           onMoveMade={(move) => {
             return this.make_move(move)
@@ -304,6 +328,7 @@ export class App extends React.Component {
             return this.reset_game()
           }}
         />
+        )}
       </>
     );
   }

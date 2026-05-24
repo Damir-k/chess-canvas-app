@@ -1,0 +1,161 @@
+/* DifficultyModal.css - черно-белый минимализм */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #1a1a1a;
+  padding: 2rem;
+  border-radius: 1rem;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+  min-width: 280px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal-content h2 {
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: none;
+}
+
+.difficulty-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ОДИНАКОВЫЙ РАЗМЕР ДЛЯ ВСЕХ КНОПОК */
+.difficulty-buttons button {
+  width: 100%;
+  padding: 1rem;
+  font-size: clamp(1rem, 4vw, 1.25rem);
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  /* text-transform: uppercase; ← УДАЛИТЬ ЭТУ СТРОКУ */
+  letter-spacing: 0.5px; /* Можно уменьшить letter-spacing */
+  position: relative;
+  overflow: hidden;
+}
+
+/* СТРОГИЙ ЧБ СТИЛЬ ДЛЯ ВСЕХ КНОПОК */
+.difficulty-buttons button {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #444;
+}
+
+/* Эффект при наведении */
+.difficulty-buttons button:hover {
+  background: #3a3a3a;
+  color: #ffffff;
+  transform: scale(1.02);
+  border-color: #666;
+}
+
+/* Эффект при клике/нажатии */
+.difficulty-buttons button:active {
+  transform: scale(0.98);
+}
+
+/* Акцент на выбранной сложности (опционально) */
+.difficulty-buttons button.selected {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Фокус для навигации с пульта ТВ */
+.difficulty-buttons button:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 3px;
+  background: #3a3a3a;
+}
+
+/* Адаптация для телефонов */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 1.5rem;
+    width: 85%;
+    max-width: 320px;
+  }
+  
+  .difficulty-buttons button {
+    padding: 0.875rem;
+  }
+}
+
+/* Адаптация для больших экранов и ТВ */
+@media (min-width: 1280px) {
+  .modal-content {
+    max-width: 500px;
+    padding: 2.5rem;
+  }
+  
+  .difficulty-buttons {
+    gap: 1.25rem;
+  }
+  
+  .difficulty-buttons button {
+    padding: 1.25rem;
+    font-size: 1.25rem;
+  }
+}
+
+/* Альбомная ориентация на телефонах */
+@media (max-width: 768px) and (orientation: landscape) {
+  .modal-content {
+    padding: 1rem;
+    max-width: 600px;
+  }
+  
+  .difficulty-buttons {
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
+  .modal-content h2 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+  }
+  
+  .difficulty-buttons button {
+    padding: 0.75rem;
+  }
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-content {
+  animation: fadeIn 0.2s ease-out;
+}
