@@ -2,7 +2,7 @@
   position: fixed;
   right: 0;
   top: 0;
-  width: 280px;
+  width: 240px;
   height: 100vh;
   background: rgba(0, 0, 0, 0.85);
   color: white;
@@ -35,9 +35,11 @@
 /* Телефоны */
 @media (max-width: 768px) {
   .help-sidebar {
+    position: relative;
+    border-radius: 15px;
     width: 100%;
     height: auto;
-    bottom: 0;
+    bottom: 128px;
     top: auto;
     padding: 12px 16px;
     display: flex;

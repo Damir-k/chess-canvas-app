@@ -84,6 +84,23 @@ body {
   
 } */
 
+.difficulty-mark {
+  /* position: fixed; */
+  /* top: 10px; */
+  /* right: 290px;  */
+  margin-top: 20px;
+  width: 100%;
+  text-align: center;
+  justify-self: center;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 101;
+  font-size: 14px;
+}
+
 
 @media (min-height: 750px) and (max-height: 1035px) {
   #main-board {

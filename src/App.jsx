@@ -6,7 +6,6 @@ import { Game } from './pages/Game';
 import { Chess, DEFAULT_POSITION } from 'chess.js'
 
 import { DifficultyModal } from './components/DifficultyModal';
-import HelpSidebar from './components/HelpSidebar/HelpSidebar';
 
 const initializeAssistant = (getState /*: any*/, getRecoveryState) => {
   if (import.meta.env.MODE === 'development') {
@@ -332,7 +331,7 @@ export class App extends React.Component {
           }}
         />
         )}
-        <HelpSidebar />
+        
       </>
     );
   }
