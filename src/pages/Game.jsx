@@ -1,9 +1,6 @@
 // Game.jsx
 
 import React from 'react';
-import {AddTask} from '../components/AddTask';
-import {DeleteAll} from '../components/DeleteAll';
-import {TaskItemList} from '../components/TaskItemList';
 import {MakeMove} from '../components/MakeMove'
 import { ChessboardComponent } from '../components/Chessboard';
 import { UndoMove } from '../components/UndoMove';
@@ -11,7 +8,7 @@ import { ResetGame } from '../components/ResetGame';
 import HelpSidebar from '../components/HelpSidebar/HelpSidebar';
 
 export const Game = (props) => {
-  const { items, onAdd, onDone, onDelete, onDeleteAll, onMoveMade, chess, onUndoMove, onGameReset, difficulty} = props;
+  const { onMoveMade, chess, onUndoMove, onGameReset, difficulty} = props;
   // console.log('Game получил difficulty:', difficulty); // для проверки
   // console.log('ВСЕ пропсы:', props);
   // Функция для получения названия 
@@ -35,11 +32,12 @@ export const Game = (props) => {
       }}>
         {diffDisplay.text}
       </div>
-
+{/*       
       <MakeMove
         chess = { chess }
         onMoveMade = { onMoveMade }
       />
+       */}
       <div className='buttons'>
       <UndoMove
         chess = { chess }
