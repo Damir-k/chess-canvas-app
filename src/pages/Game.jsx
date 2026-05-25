@@ -8,9 +8,40 @@ import { UndoMove } from '../components/UndoMove';
 import { ResetGame } from '../components/ResetGame';
 
 export const Game = (props) => {
-  const { items, onAdd, onDone, onDelete, onDeleteAll, onMoveMade, chess, onUndoMove, onGameReset } = props;
+  const { items, onAdd, onDone, onDelete, onDeleteAll, onMoveMade, chess, onUndoMove, onGameReset, difficulty} = props;
+
+  // Функция для получения названия 
+  const getDifficultyDisplay = (level) => {
+    switch(level) {
+      case 'easy': return { text: 'Лёгкая', color: '#4CAF50' };
+      case 'medium': return { text: 'Средняя', color: '#FFC107' };
+      case 'hard': return { text: 'Сложная', color: '#f44336' };
+      default: return { text: 'Средняя', color: '#FFC107' };
+    }
+  };
+
+  const diffDisplay = getDifficultyDisplay(difficulty);
+
   return (
+    
     <main className="container">
+
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        backgroundColor: diffDisplay.color,
+        color: 'white',
+        padding: '8px 16px',
+        borderRadius: '20px',
+        fontWeight: 'bold',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+        zIndex: 100,
+        fontSize: '14px'
+      }}>
+        {diffDisplay.emoji} {diffDisplay.text}
+      </div>
+
       <MakeMove
         chess = { chess }
         onMoveMade = { onMoveMade }
