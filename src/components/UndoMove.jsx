@@ -15,7 +15,7 @@ export class UndoMove extends React.Component {
             className="control-button"
             type="button"
             value="Вернуть ход"
-            disabled={chess.turn() === 'b' || chess.moveNumber() === 1}
+            disabled={chess.turn() === 'b' || chess.moveNumber() === 1 || chess.isGameOver()}
             onClick={ (event) => onUndoMove()}
             />
         )

@@ -1,6 +1,7 @@
-/* DifficultyModal.css - черно-белый минимализм */
+/* GameOverModal.css - черно-белый минимализм */
 
-.modal-overlay {
+/* Используем ту же структуру, что и в DifficultyModal */
+.gameover-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -10,10 +11,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 700;
+  z-index: 1000;
 }
 
-.modal-content {
+.gameover-panel {
   background: #1a1a1a;
   padding: 2rem;
   border-radius: 1rem;
@@ -23,124 +24,149 @@
   min-width: 280px;
   width: 90%;
   max-width: 400px;
+  animation: fadeIn 0.2s ease-out;
 }
 
-.modal-content h2 {
+.gameover-panel h2 {
   color: #ffffff;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: clamp(1.5rem, 5vw, 2rem);
   font-weight: 500;
   letter-spacing: 1px;
-  text-transform: none;
 }
 
-.difficulty-buttons {
+.gameover-panel .gameover-description {
+  color: #999;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.gameover-panel p {
+  color: #e0e0e0;
+  margin-bottom: 2rem;
+  font-size: clamp(0.875rem, 4vw, 1rem);
+  line-height: 1.5;
+}
+
+.gameover-buttons {
   display: flex;
   gap: 1rem;
-  flex-direction: column;
+  justify-content: center;
   width: 100%;
 }
 
 /* ОДИНАКОВЫЙ РАЗМЕР ДЛЯ ВСЕХ КНОПОК */
-.difficulty-buttons button {
-  width: 100%;
-  padding: 1rem;
-  font-size: clamp(1rem, 4vw, 1.25rem);
+.gameover-buttons button {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  font-size: clamp(0.875rem, 4vw, 1rem);
   font-weight: 600;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  /* text-transform: uppercase; ← УДАЛИТЬ ЭТУ СТРОКУ */
-  letter-spacing: 0.5px; /* Можно уменьшить letter-spacing */
+  letter-spacing: 0.5px;
   position: relative;
   overflow: hidden;
 }
 
-/* СТРОГИЙ ЧБ СТИЛЬ ДЛЯ ВСЕХ КНОПОК */
-.difficulty-buttons button {
+/* СТРОГИЙ ЧБ СТИЛЬ ДЛЯ КНОПОК */
+.gameover-buttons button:first-child {
   background: #2a2a2a;
   color: #e0e0e0;
   border: 1px solid #444;
 }
 
+.gameover-buttons button:last-child {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+}
+
 /* Эффект при наведении */
-.difficulty-buttons button:hover {
+.gameover-buttons button:first-child:hover {
   background: #3a3a3a;
   color: #ffffff;
   transform: scale(1.02);
   border-color: #666;
 }
 
-/* Эффект при клике/нажатии */
-.difficulty-buttons button:active {
-  transform: scale(0.98);
-}
-
-/* Акцент на выбранной сложности (опционально) */
-.difficulty-buttons button.selected {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
+.gameover-buttons button:last-child:hover {
+  background: #e0e0e0;
+  transform: scale(1.02);
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
 }
 
+/* Эффект при клике/нажатии */
+.gameover-buttons button:active {
+  transform: scale(0.98);
+}
+
 /* Фокус для навигации с пульта ТВ */
-.difficulty-buttons button:focus-visible {
+.gameover-buttons button:focus-visible {
   outline: 3px solid white;
   outline-offset: 3px;
-  background: #3a3a3a;
 }
 
 /* Адаптация для телефонов */
 @media (max-width: 768px) {
-  .modal-content {
+  .gameover-panel {
     padding: 1.5rem;
     width: 85%;
     max-width: 320px;
   }
   
-  .difficulty-buttons button {
-    padding: 0.875rem;
+  .gameover-buttons button {
+    padding: 0.625rem 1rem;
+  }
+  
+  .gameover-buttons {
+    gap: 0.75rem;
   }
 }
 
 /* Адаптация для больших экранов и ТВ */
 @media (min-width: 1280px) {
-  .modal-content {
+  .gameover-panel {
     max-width: 500px;
     padding: 2.5rem;
   }
   
-  .difficulty-buttons {
+  .gameover-buttons {
     gap: 1.25rem;
   }
   
-  .difficulty-buttons button {
-    padding: 1.25rem;
-    font-size: 1.25rem;
+  .gameover-buttons button {
+    padding: 0.875rem 2rem;
+    font-size: 1.125rem;
   }
 }
 
 /* Альбомная ориентация на телефонах */
 @media (max-width: 768px) and (orientation: landscape) {
-  .modal-content {
+  .gameover-panel {
     padding: 1rem;
     max-width: 600px;
   }
   
-  .difficulty-buttons {
+  .gameover-buttons {
     flex-direction: row;
     gap: 1rem;
   }
   
-  .modal-content h2 {
-    margin-bottom: 1rem;
+  .gameover-panel h2 {
+    margin-bottom: 0.75rem;
     font-size: 1.25rem;
   }
   
-  .difficulty-buttons button {
-    padding: 0.75rem;
+  .gameover-panel p {
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .gameover-buttons button {
+    padding: 0.5rem 1rem;
   }
 }
 
@@ -154,8 +180,4 @@
     opacity: 1;
     transform: scale(1);
   }
-}
-
-.modal-content {
-  animation: fadeIn 0.2s ease-out;
 }
