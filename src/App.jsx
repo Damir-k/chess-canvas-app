@@ -61,7 +61,8 @@ export class App extends React.Component {
       // отображение окна выбора сложности (по ум. тру)
       showDifficultyModal: true,
       // сложность по умолчанию   
-      difficulty: 'medium',       
+      difficulty: 'medium',     
+      gameState: "in-progress",
     };
 
     this.assistant = initializeAssistant(() => this.getStateForAssistant());
@@ -252,15 +253,21 @@ export class App extends React.Component {
     console.log(chess)
     if (chess.isCheckmate()) {
       if (chess.turn() === 'w') {
-        alert("Black won!")
+        // alert("Black won!")
+        this.setState({ gameState: "player-lost" })
+        this.say_phrase("В этот раз я победитель. Хорошая игра!")
       } else {
-        alert("White won!")
+        // alert("White won!")
+        this.setState({ gameState: "player-won" })
+        this.say_phrase("Поздравляю! Вы меня победили!")
       }
     } else if (chess.isDraw() || chess.isDrawByFiftyMoves() || chess.isStalemate() || 
     chess.isInsufficientMaterial() || chess.isThreefoldRepetition()) {
-      alert("It's a draw!")
+      // alert("It's a draw!")
+      this.setState( {gameState: "tie"} )
+      this.say_phrase("Кажется игра закончилась ничьёй. Спасибо за игру!")
     } else {
-      alert("What is happening")
+      this.say_phrase("Что-то пошло не так. Пожалуйста, перезагрузите приложение.")
     }
   }
 
@@ -303,8 +310,22 @@ export class App extends React.Component {
   }
 
   reset_game() {
+    this.setState({gameState: "in-progress"})
     const newChess = initializeChessMatch()
     this.setState({ chess: newChess })
+  }
+
+  handleTextInput(input) {
+    if (input.startsWith("pos:")) {
+      this.reset_game()
+      let newChess = this.update_chess()
+      switch(input.slice(4)) {
+        case 'w': newChess.load("k7/8/KQ6/8/8/8/8/8 w - - 0 1"); break;
+        case 'b': newChess.load("k7/pp4KR/r7/8/8/8/7q/5r1r w - - 0 1"); break;
+      }
+      return true;
+    }
+    return this.make_move(input)
   }
 
   render() {
@@ -320,14 +341,23 @@ export class App extends React.Component {
           <Game
           difficulty={this.state.difficulty}  // передача сложности в игру
           chess={this.state.chess}
-          onMoveMade={(move) => {
-            return this.make_move(move)
+          gameState={this.state.gameState}
+          onMoveMade={(input) => {
+            return this.handleTextInput(input)
           }}
           onUndoMove={() => {
             return this.take_back()
           }}
           onGameReset={() => {
             return this.reset_game()
+          }}
+          onGameOverChoice={(choice) => {
+            switch (choice) {
+              case "restart": 
+                return this.reset_game();
+              case "return": 
+                return this.setState( {gameState: "viewing-game"} )
+            }
           }}
         />
         )}

@@ -6,9 +6,10 @@ import { ChessboardComponent } from '../components/Chessboard';
 import { UndoMove } from '../components/UndoMove';
 import { ResetGame } from '../components/ResetGame';
 import HelpSidebar from '../components/HelpSidebar/HelpSidebar';
+import { GameOverModal } from '../components/GameOverModal';
 
 export const Game = (props) => {
-  const { onMoveMade, chess, onUndoMove, onGameReset, difficulty} = props;
+  const { onMoveMade, chess, onUndoMove, onGameReset, difficulty, gameState, onGameOverChoice} = props;
   // console.log('Game получил difficulty:', difficulty); // для проверки
   // console.log('ВСЕ пропсы:', props);
   // Функция для получения названия 
@@ -22,22 +23,28 @@ export const Game = (props) => {
   };
   
   const diffDisplay = getDifficultyDisplay(difficulty);
-
+  
   return (
     
     <main className="container">
-
+      <GameOverModal
+        gameState = { gameState }
+        onGameOverChoice = { onGameOverChoice }
+        difficulty = { difficulty }
+      />
+      
       <div className='difficulty-mark' style={{
         backgroundColor: diffDisplay.color,
       }}>
         {diffDisplay.text}
       </div>
-{/*       
+      
+      {import.meta.env.MODE === 'development' &&       
       <MakeMove
         chess = { chess }
         onMoveMade = { onMoveMade }
       />
-       */}
+      }
       <div className='buttons'>
       <UndoMove
         chess = { chess }
@@ -51,8 +58,9 @@ export const Game = (props) => {
       <ChessboardComponent 
         chess = { chess }
         onMoveMade = { onMoveMade }
-      />
+        />
       <HelpSidebar />
     </main>
+    
   )
 }
