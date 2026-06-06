@@ -304,7 +304,10 @@ export class App extends React.Component {
 
   reset_game() {
     const newChess = initializeChessMatch()
-    this.setState({ chess: newChess })
+    this.setState({ chess: newChess,
+      showDifficultyModal: true // показываем окно выбора сложности
+     })
+    
   }
 
   render() {
