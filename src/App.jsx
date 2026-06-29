@@ -331,19 +331,6 @@ export class App extends React.Component {
     return this.make_move(input)
   }
 
-  handleTextInput(input) {
-    if (input.startsWith("pos:")) {
-      this.reset_game()
-      let newChess = this.update_chess()
-      switch(input.slice(4)) {
-        case 'w': newChess.load("k7/8/KQ6/8/8/8/8/8 w - - 0 1"); break;
-        case 'b': newChess.load("k7/pp4KR/r7/8/8/8/7q/5r1r w - - 0 1"); break;
-      }
-      return true;
-    }
-    return this.make_move(input)
-  }
-
   render() {
     // console.log('render');
     return (
