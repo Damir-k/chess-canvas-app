@@ -4,7 +4,7 @@ import { createAssistant, createSmartappDebugger } from '@salutejs/client';
 import './App.css';
 import { Game } from './pages/Game';
 import { Chess, DEFAULT_POSITION } from 'chess.js'
-
+import { StockfishInterface } from './stockfishInterface'
 import { DifficultyModal } from './components/DifficultyModal';
 
 const initializeAssistant = (getState /*: any*/, getRecoveryState) => {
@@ -58,6 +58,7 @@ export class App extends React.Component {
     this.state = {
       notes: [{ id: Math.random().toString(36).substring(7), title: 'тест', completed: false }],
       chess: initializeChessMatch(),
+      stockfish: new StockfishInterface(),
       // отображение окна выбора сложности (по ум. тру)
       showDifficultyModal: true,
       // сложность по умолчанию   
@@ -286,18 +287,18 @@ export class App extends React.Component {
     }
 
     if (newChess.turn() === 'b') {
-      let blackMoves = newChess.moves()
-      let responseMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
-      console.log("black's turn is going to be: ", responseMove)
-      setTimeout(() => this.make_move(responseMove), 500)
-
-      // let previous_moves = newChess.history().join(' ')
-      // console.log(previous_moves)
-
-      // postChessApi({ input: previous_moves }).then((data) => {
-      //   console.log(data)
-      //   setTimeout(() => this.make_move(data.san), 500)
-      // })
+      let previous_moves = newChess.history()
+      this.state.stockfish.setPosition(previous_moves)
+      setTimeout(() => {
+        let bestmove = this.state.stockfish.bestmove()
+        if (bestmove === "NONE") {
+          console.error("stockfish didn't return a bestmove")
+          return false
+        }
+        console.log("stockfish choice: " + bestmove)
+        this.make_move(bestmove)
+      }, 500)
+      
 
     }
     return true
