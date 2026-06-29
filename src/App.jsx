@@ -4,7 +4,7 @@ import { createAssistant, createSmartappDebugger } from '@salutejs/client';
 import './App.css';
 import { Game } from './pages/Game';
 import { Chess, DEFAULT_POSITION } from 'chess.js'
-
+import { StockfishInterface } from './stockfishInterface'
 import { DifficultyModal } from './components/DifficultyModal';
 
 const initializeAssistant = (getState /*: any*/, getRecoveryState) => {
@@ -54,10 +54,10 @@ export class App extends React.Component {
   constructor(props) {
     super(props);
     // console.log('constructor');
-
     this.state = {
       notes: [{ id: Math.random().toString(36).substring(7), title: 'тест', completed: false }],
       chess: initializeChessMatch(),
+      stockfish: null,
       // отображение окна выбора сложности (по ум. тру)
       showDifficultyModal: true,
       // сложность по умолчанию   
@@ -98,8 +98,17 @@ export class App extends React.Component {
     });
   }
 
+  async componentDidMount() {
+        this.state.stockfish = new StockfishInterface();
+        await this.state.stockfish.init();
+        this.setState({ stockfishReady: true });
+    }
+
   // Обработчик выбора сложности
   handleDifficultySelect = (level) => {
+    if (level === "hard") this.state.stockfish.setSkillLevel(20);
+    if (level === "medium") this.state.stockfish.setSkillLevel(10);
+    if (level === "easy") this.state.stockfish.setSkillLevel(0);
     console.log('Выбрана сложность:', level);
     this.setState({ 
       difficulty: level,
@@ -286,18 +295,19 @@ export class App extends React.Component {
     }
 
     if (newChess.turn() === 'b') {
-      let blackMoves = newChess.moves()
-      let responseMove = blackMoves[Math.floor(Math.random()* blackMoves.length)]
-      console.log("black's turn is going to be: ", responseMove)
-      setTimeout(() => this.make_move(responseMove), 500)
-
-      // let previous_moves = newChess.history().join(' ')
-      // console.log(previous_moves)
-
-      // postChessApi({ input: previous_moves }).then((data) => {
-      //   console.log(data)
-      //   setTimeout(() => this.make_move(data.san), 500)
-      // })
+      let previous_moves = newChess.history()
+      console.log(previous_moves);
+      this.state.stockfish.setPosition(newChess.fen())
+      setTimeout(() => {
+        let bestmove = this.state.stockfish.getBestmove()
+        if (bestmove === "NONE") {
+          console.error("stockfish didn't return a bestmove")
+          return false
+        }
+        console.log("stockfish choice: " + bestmove)
+        this.make_move(bestmove)
+      }, 500)
+      
 
     }
     return true

@@ -1716,6 +1716,11 @@ stack-utils@^2.0.3:
   dependencies:
     escape-string-regexp "^2.0.0"
 
+stockfish@^18.0.7:
+  version "18.0.7"
+  resolved "https://registry.yarnpkg.com/stockfish/-/stockfish-18.0.7.tgz#e03129b2ea6cc15b2f70a917357062759e4346f4"
+  integrity sha512-tJ+bfMAHs4fV7QYiLcHUicx1RzKOQwj8twx/z0iUTauMG+SE3l1rEtRSg+WER81ke3bc5tqKBWEWntUbydkgZg==
+
 strip-indent@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/strip-indent/-/strip-indent-3.0.0.tgz#c32e1cee940b6b3432c771bc2c54bcce73cd3001"
