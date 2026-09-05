@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { act } from 'react';
 import { createAssistant, createSmartappDebugger } from '@salutejs/client';
 
 import './App.css';
@@ -156,6 +156,8 @@ export class App extends React.Component {
         // НОВЫЙ e2e4 СВЕЖИЙ НЕРАЗДЕЛАННЫЙ 
         case 'e2e4_move':
           return this.handle_make_e2e4_attempt(action.move)
+        case 'difficulty_select':
+          return this.handleDifficultySelect(action.difficulty)
         default:
           console.error("unknown action type:", action.type)
       }

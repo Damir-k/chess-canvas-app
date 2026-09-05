@@ -1,72 +1,35 @@
-.help-sidebar {
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: 240px;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.85);
-  color: white;
-  padding: 20px;
-  z-index: 100;
+.help-sidebar { min-width: 0; padding: 24px; background: #242c25; border: 1px solid #3a443b; border-radius: 20px; color: var(--text); }
+.help-kicker { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: 1.6px; }
+.help-sidebar h2 { font-size: 24px; font-weight: 600; margin: 10px 0 12px; letter-spacing: -0.5px; }
+.help-intro { margin: 0 0 16px; color: #bcc4bb; font-size: 14px; line-height: 1.5; }
+.command-list { display: grid; gap: 16px; }
+.command-item { min-width: 0; border-top: 1px solid #3b463c; padding-top: 12px; }
+.command-shortcut { display: block; color: #b6c0b3; font-size: 12px; margin-bottom: 8px; }
+.command-phrase { display: block; color: #e6edce; font-size: 21px; font-weight: 600; }
+.command-desc { display: block; color: #b6c0b3; font-size: 12px; margin-top: 6px; line-height: 1.5; }
+.help-footer { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid #3b463c; color: #b6c0b3; font-size: 12px; line-height: 1.6; }
+@media (orientation: portrait), (max-width: 900px) {
+  .help-sidebar { width: min(100%, 880px); margin-inline: auto; }
+  .command-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .help-intro { max-width: 640px; }
 }
-
-.sidebar-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 20px;
+@media (orientation: portrait) and (min-width: 700px), (min-width: 1600px) {
+  .help-sidebar { padding: 28px; }
+  .help-sidebar h2 { font-size: 28px; }
+  .help-kicker { font-size: 12px; }
+  .help-intro { font-size: 17px; }
+  .command-shortcut, .command-desc, .help-footer { font-size: 15px; }
+  .command-phrase { font-size: 24px; }
 }
-
-.command-item {
-  margin-bottom: 16px;
+@media (max-width: 560px) {
+  .help-sidebar { padding: 20px; }
+  .command-list { grid-template-columns: 1fr; gap: 16px; }
+  .command-item { display: grid; grid-template-columns: 1fr 1fr; align-items: baseline; gap: 6px 12px; }
+  .command-shortcut { margin: 0; }
+  .command-phrase { font-size: 18px; }
+  .command-desc { grid-column: 1 / -1; margin: 0; }
 }
-
-.command-shortcut {
-  display: block;
-  font-weight: bold;
-  color: #4A90D9;
-  margin-bottom: 4px;
-}
-
-.command-desc {
-  display: block;
-  opacity: 0.8;
-}
-
-/* Телефоны */
-@media (max-width: 768px) {
-  .help-sidebar {
-    position: relative;
-    border-radius: 15px;
-    width: 100%;
-    height: auto;
-    bottom: 128px;
-    top: auto;
-    padding: 12px 16px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  
-  .sidebar-title {
-    width: 100%;
-    margin-bottom: 4px;
-    font-size: 14px;
-  }
-  
-  .command-item {
-    margin-bottom: 0;
-  }
-}
-
-/* ТВ */
-@media (min-width: 1920px) {
-  .help-sidebar {
-    width: 350px;
-    font-size: 20px;
-    padding: 30px;
-  }
-  
-  .sidebar-title {
-    font-size: 24px;
-  }
+@media (orientation: landscape) and (max-height: 650px) {
+  .help-sidebar { padding: 18px; }
+  .command-list { grid-template-columns: 1fr; }
 }

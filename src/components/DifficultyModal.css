@@ -159,3 +159,11 @@
 .modal-content {
   animation: fadeIn 0.2s ease-out;
 }
+/* Shared palette and safe scrolling on short displays. */
+.modal-overlay { padding: 24px 16px calc(144px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; background: #141a15ed; }
+.modal-content { flex-shrink: 0; min-width: 0; max-height: calc(100dvh - 184px); overflow-y: auto; background: #242c25; border-color: #43503d; border-radius: 24px; }
+.modal-content h2 { margin-top: 0; color: #f3f1e8; letter-spacing: -0.5px; }
+.difficulty-buttons button { min-height: 48px; background: #303a32; border-color: #4c574e; color: #f3f1e8; }
+.difficulty-buttons button:hover, .difficulty-buttons button:focus-visible { background: #43503d; border-color: #b8d88e; }
+.difficulty-buttons button:focus-visible { outline-color: #b8d88e; }
+@media (max-height: 520px) { .modal-overlay { padding-bottom: 24px; } .modal-content { max-height: calc(100dvh - 48px); } }

@@ -1,66 +1,46 @@
-// Game.jsx
-
 import React from 'react';
-import {MakeMove} from '../components/MakeMove'
 import { ChessboardComponent } from '../components/Chessboard';
 import { UndoMove } from '../components/UndoMove';
 import { ResetGame } from '../components/ResetGame';
 import HelpSidebar from '../components/HelpSidebar/HelpSidebar';
 import { GameOverModal } from '../components/GameOverModal';
 
-export const Game = (props) => {
-  const { onMoveMade, chess, onUndoMove, onGameReset, difficulty, gameState, onGameOverChoice} = props;
-  // console.log('Game получил difficulty:', difficulty); // для проверки
-  // console.log('ВСЕ пропсы:', props);
-  // Функция для получения названия 
-  const getDifficultyDisplay = (difficulty) => {
-    switch(difficulty) {
-      case 'easy': return { text: 'Лёгкая', color: '#4CAF50' };
-      case 'medium': return { text: 'Средняя', color: '#FFC107' };
-      case 'hard': return { text: 'Сложная', color: '#f44336' };
-      default: return { text: 'Некая', color: '#09658a' };
-    }
-  };
-  
-  const diffDisplay = getDifficultyDisplay(difficulty);
-  
+const difficultyLabels = { easy: 'Лёгкая', medium: 'Средняя', hard: 'Сложная' };
+
+export const Game = ({ onMoveMade, chess, onUndoMove, onGameReset, difficulty, gameState, onGameOverChoice }) => {
+  const status = chess.isGameOver() ? 'Партия завершена' : chess.turn() === 'w'
+    ? (chess.isCheck() ? 'Вам шах · ваш ход' : 'Ваш ход') : 'Ход Салюта';
   return (
-    
     <main className="container">
-      <GameOverModal
-        gameState = { gameState }
-        onGameOverChoice = { onGameOverChoice }
-        difficulty = { difficulty }
-      />
-      
-      <div className='difficulty-mark' style={{
-        backgroundColor: diffDisplay.color,
-      }}>
-        {diffDisplay.text}
+      <GameOverModal gameState={gameState} onGameOverChoice={onGameOverChoice} difficulty={difficulty} />
+      <header className="game-header">
+        <div className="game-brand">
+          <span className="brand-piece" aria-hidden="true">♞</span>
+          <div><p className="eyebrow">ИГРА С АССИСТЕНТОМ</p><h1>Шахматы с Салютом</h1></div>
+        </div>
+        <span className={`difficulty-mark difficulty-${difficulty}`}>
+          <span className="difficulty-dot" aria-hidden="true" />
+          {difficultyLabels[difficulty] || 'Средняя'} сложность
+        </span>
+      </header>
+      <div className="game-layout">
+        <section className="play-area" aria-label="Шахматная партия">
+          <div className="player-row">
+            <div className="player-info"><span className="player-avatar" aria-hidden="true">С</span><div><strong>Салют</strong><span>Чёрные фигуры</span></div></div>
+            <span className="turn-status" role="status">{status}</span>
+          </div>
+          <ChessboardComponent chess={chess} onMoveMade={onMoveMade} />
+          <div className="player-row player-row-bottom">
+            <div className="player-info"><span className="player-avatar player-avatar-light" aria-hidden="true">В</span><div><strong>Вы</strong><span>Белые фигуры</span></div></div>
+            <span className="move-number">Ход {chess.moveNumber()}</span>
+          </div>
+          <div className="buttons" aria-label="Управление партией">
+            <UndoMove chess={chess} onUndoMove={onUndoMove} />
+            <ResetGame chess={chess} onGameReset={onGameReset} />
+          </div>
+        </section>
+        <HelpSidebar />
       </div>
-      
-      {import.meta.env.MODE === 'development' &&       
-      <MakeMove
-        chess = { chess }
-        onMoveMade = { onMoveMade }
-      />
-      }
-      <div className='buttons'>
-      <UndoMove
-        chess = { chess }
-        onUndoMove = { onUndoMove }
-      />
-      <ResetGame
-        chess = { chess }
-        onGameReset = { onGameReset }
-      />
-      </div>
-      <ChessboardComponent 
-        chess = { chess }
-        onMoveMade = { onMoveMade }
-        />
-      <HelpSidebar />
     </main>
-    
-  )
-}
+  );
+};
