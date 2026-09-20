@@ -11,7 +11,7 @@ const HelpSidebar = () => (
       <div className="command-item"><span className="command-shortcut">Отменить ход</span><span className="command-phrase">«Верни ход»</span><span className="command-desc">Вернуться к прошлой позиции</span></div>
       <div className="command-item"><span className="command-shortcut">Начать сначала</span><span className="command-phrase">«По новой»</span><span className="command-desc">Новая партия с Салютом</span></div>
     </div>
-    <p className="help-footer">Можно и вручную: перетащите фигуру на нужную клетку.</p>
+    <p className="help-footer" id="remote-help">Пульт: стрелки — клетка, OK — выбрать фигуру и выполнить ход, Назад — отменить выбор. Вниз с нижнего края доски — кнопки игры, вверх — обратно. На клавиатуре: Enter и Escape. Мышью или касанием: выберите две клетки или перетащите фигуру.</p>
   </aside>
 );
 export default HelpSidebar;

@@ -18,7 +18,7 @@ export class StockfishInterface {
             try {
                 // Create a Worker from the stockfish file
                 this.worker = new Worker(
-                    new URL('./stockfish-18-lite-single.js', import.meta.url),
+                    `${import.meta.env.BASE_URL}stockfish-18-lite-single.js`,
                     { type: 'classic' }
                 );
                 
@@ -34,7 +34,6 @@ export class StockfishInterface {
                         
                         // Set up position and start analysis
                         this.sendCommand("position startpos");
-                        this.sendCommand("go movetime 300");
                         
                         resolve();
                     }

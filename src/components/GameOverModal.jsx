@@ -1,6 +1,7 @@
 import React from 'react'
 import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import './GameOverModal.css'
+import { consume, isBack, navigateControls, remoteKey } from '../remote'
 
 export class GameOverModal extends React.Component {
   constructor(props) {
@@ -12,7 +13,7 @@ export class GameOverModal extends React.Component {
     const {difficulty} = this.props
     switch (difficulty) {
       case "easy": return "Лёгкий";
-      case "normal": return "Средний";
+      case "medium": return "Средний";
       case "hard": return "Сложный";
       default: return "Неизвестный";
     }
@@ -57,14 +58,19 @@ export class GameOverModal extends React.Component {
     console.log('GameOverModal - isOpen:', isOpen, 'gameState:', gameState);
 
     return (
-      <Dialog open={isOpen} onClose={this.handleClose}>
+      <Dialog open={isOpen} onClose={this.handleClose} onKeyDown={event => {
+        if (isBack(remoteKey(event))) {
+          consume(event);
+          if (!event.repeat) this.handleClose();
+        } else navigateControls(event);
+      }}>
         <div className="gameover-container">
           <DialogPanel className="gameover-panel">
             <DialogTitle>{this.getTitle()}</DialogTitle>
             <Description className="gameover-description">{this.getDescription()}</Description>
             <p>Хотите посмотреть на доску ещё раз?</p>
             <div className="gameover-buttons">
-              <button onClick={this.handleClose}>Вернуться к доске</button>
+              <button data-autofocus onClick={this.handleClose}>Вернуться к доске</button>
               <button onClick={this.handleRestart}>Начать с начала</button>
             </div>
           </DialogPanel>

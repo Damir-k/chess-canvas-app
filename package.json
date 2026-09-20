@@ -24,6 +24,7 @@
     "web-vitals": "^3.5.2"
   },
   "scripts": {
+    "test": "node --test tests/remote.test.cjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

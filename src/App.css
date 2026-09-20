@@ -43,6 +43,9 @@ button, input { font: inherit; }
 .player-row-bottom { margin: 8px 0 12px; }
 .move-number { color: var(--muted); font-size: 13px; }
 #main-board { width: 100%; aspect-ratio: 1; border-radius: 6px; box-shadow: 0 12px 40px #0005; touch-action: none; }
+#main-board:focus { outline: 3px solid #fff; outline-offset: 3px; }
+.board-feedback { min-height: 1.4em; margin: 8px 0; color: var(--accent); font-size: 14px; }
+.buttons input:focus, [role="dialog"] button:focus { outline: 4px solid #fff; outline-offset: 3px; }
 .buttons { display: flex; gap: 12px; }
 .control-button { flex: 1; min-width: 0; min-height: 48px; padding: 12px 10px; margin: 0; border: 1px solid #4c574e; border-radius: 12px; background: #303a32; color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer; transition: background 150ms; }
 .control-button:hover:not(:disabled) { background: #43503d; }

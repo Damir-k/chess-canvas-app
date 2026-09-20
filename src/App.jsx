@@ -99,13 +99,20 @@ export class App extends React.Component {
   }
 
   async componentDidMount() {
+      try {
         this.state.stockfish = new StockfishInterface();
         await this.state.stockfish.init();
+        this.state.stockfish.setSkillLevel({ easy: 0, medium: 10, hard: 20 }[this.state.difficulty]);
         this.setState({ stockfishReady: true });
+      } catch (error) {
+        console.error('Stockfish initialization failed', error);
+        this.setState({ engineError: true });
+      }
     }
 
   // Обработчик выбора сложности
   handleDifficultySelect = (level) => {
+    if (!this.state.stockfishReady) return;
     if (level === "hard") this.state.stockfish.setSkillLevel(20);
     if (level === "medium") this.state.stockfish.setSkillLevel(10);
     if (level === "easy") this.state.stockfish.setSkillLevel(0);
@@ -283,32 +290,37 @@ export class App extends React.Component {
   }
 
   make_move(move) {
-    const newChess = this.update_chess()
+    const newChess = initializeChessMatch(this.state.chess.fen());
+    newChess.loadPgn(this.state.chess.pgn());
 
     try {
       newChess.move(move);
     } catch {
       return false
     }
+    this.setState({ chess: newChess });
 
     if (newChess.isGameOver()) {
-      setTimeout(() => this.show_result(newChess), 1000)
+      this.resultTimer = setTimeout(() => {
+        if (this.state.chess === newChess) this.show_result(newChess);
+      }, 1000)
       return true
     }
 
     if (newChess.turn() === 'b') {
       let previous_moves = newChess.history()
       console.log(previous_moves);
-      this.state.stockfish.setPosition(newChess.fen())
-      setTimeout(() => {
-        let bestmove = this.state.stockfish.getBestmove()
-        if (bestmove === "NONE") {
-          console.error("stockfish didn't return a bestmove")
-          return false
-        }
-        console.log("stockfish choice: " + bestmove)
-        this.make_move(bestmove)
-      }, 500)
+      const engine = this.state.stockfish;
+      const onBestmove = line => {
+        const match = /^bestmove (\S+)/.exec(line);
+        if (!match) return;
+        engine.removeListener(onBestmove);
+        this.pendingEngineListener = null;
+        if (this.state.chess === newChess && match[1] !== '(none)') this.make_move(match[1]);
+      };
+      this.pendingEngineListener = onBestmove;
+      engine.addListener(onBestmove);
+      engine.setPosition(newChess.fen());
       
 
     }
@@ -316,12 +328,19 @@ export class App extends React.Component {
   }
 
   take_back() {
+    if (this.state.chess.turn() !== 'w' || this.state.chess.history().length < 2) return false;
     const newChess = this.update_chess()
 
     return newChess.turn() === 'w' && (newChess.undo() !== null && newChess.undo() !== null)
   }
 
   reset_game() {
+    clearTimeout(this.resultTimer);
+    if (this.pendingEngineListener) {
+      this.state.stockfish.removeListener(this.pendingEngineListener);
+      this.pendingEngineListener = null;
+      this.state.stockfish.sendCommand('stop');
+    }
     this.setState({gameState: "in-progress"})
     const newChess = initializeChessMatch()
     this.setState({ chess: newChess,
@@ -331,6 +350,7 @@ export class App extends React.Component {
   }
 
   handleTextInput(input) {
+    if (typeof input !== 'string') return this.make_move(input);
     if (input.startsWith("pos:")) {
       this.reset_game()
       let newChess = this.update_chess()
@@ -343,12 +363,19 @@ export class App extends React.Component {
     return this.make_move(input)
   }
 
+  componentWillUnmount() {
+    clearTimeout(this.resultTimer);
+    this.state.stockfish?.destroy();
+  }
+
   render() {
     // console.log('render');
     return (
       <>
         <DifficultyModal 
           isOpen={this.state.showDifficultyModal}
+          ready={Boolean(this.state.stockfishReady)}
+          error={this.state.engineError}
           onSelect={this.handleDifficultySelect}
         />
         
