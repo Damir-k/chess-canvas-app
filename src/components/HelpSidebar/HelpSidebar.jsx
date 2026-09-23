@@ -1,7 +1,8 @@
 import React from 'react';
 import './HelpSidebar.css';
+import { CONTROL_INSTRUCTIONS } from '../../controlInstructions';
 
-const HelpSidebar = () => (
+const HelpSidebar = ({ controlMode = 'unknown' }) => (
   <aside className="help-sidebar" aria-labelledby="help-title">
     <span className="help-kicker">ИГРАЙТЕ ГОЛОСОМ</span>
     <h2 id="help-title">Просто скажите</h2>
@@ -11,7 +12,7 @@ const HelpSidebar = () => (
       <div className="command-item"><span className="command-shortcut">Отменить ход</span><span className="command-phrase">«Верни ход»</span><span className="command-desc">Вернуться к прошлой позиции</span></div>
       <div className="command-item"><span className="command-shortcut">Начать сначала</span><span className="command-phrase">«По новой»</span><span className="command-desc">Новая партия с Салютом</span></div>
     </div>
-    <p className="help-footer" id="remote-help">Пульт: стрелки — клетка, OK — выбрать фигуру и выполнить ход, Назад — отменить выбор. Вниз с нижнего края доски — кнопки игры, вверх — обратно. На клавиатуре: Enter и Escape. Мышью или касанием: выберите две клетки или перетащите фигуру.</p>
+    <p className="help-footer" id="remote-help">{CONTROL_INSTRUCTIONS[controlMode] || CONTROL_INSTRUCTIONS.unknown}</p>
   </aside>
 );
 export default HelpSidebar;

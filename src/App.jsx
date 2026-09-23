@@ -6,6 +6,7 @@ import { Game } from './pages/Game';
 import { Chess, DEFAULT_POSITION } from 'chess.js'
 import { StockfishInterface } from './stockfishInterface'
 import { DifficultyModal } from './components/DifficultyModal';
+import { detectControlMode, surfaceFromMessage } from './controlInstructions';
 
 const initializeAssistant = (getState /*: any*/, getRecoveryState) => {
   if (import.meta.env.MODE === 'development') {
@@ -63,11 +64,13 @@ export class App extends React.Component {
       // сложность по умолчанию   
       difficulty: 'medium',     
       gameState: "in-progress",
+      controlMode: detectControlMode(),
     };
 
     this.assistant = initializeAssistant(() => this.getStateForAssistant());
 
     this.assistant.on('data', (event /*: any*/) => {
+      this.updateControlSurface(event);
       // console.log(`assistant.on(data)`, event);
       if (event.type === 'character') {
         // console.log(`assistant.on(data): character: "${event?.character?.id}"`);
@@ -81,11 +84,14 @@ export class App extends React.Component {
 
     this.assistant.on('start', (event) => {
       let initialData = this.assistant.getInitialData();
+      if (Array.isArray(initialData)) initialData.forEach(message => this.updateControlSurface(message));
+      this.updateControlSurface(event);
 
       // console.log(`assistant.on(start)`, event, initialData);
     });
 
     this.assistant.on('command', (event) => {
+      this.updateControlSurface(event);
       // console.log(`assistant.on(command)`, event);
     });
 
@@ -109,6 +115,11 @@ export class App extends React.Component {
         this.setState({ engineError: true });
       }
     }
+
+  updateControlSurface(message) {
+    const surface = surfaceFromMessage(message);
+    if (surface) this.setState({ controlMode: detectControlMode(surface) });
+  }
 
   // Обработчик выбора сложности
   handleDifficultySelect = (level) => {
@@ -381,6 +392,7 @@ export class App extends React.Component {
         
         {!this.state.showDifficultyModal && (
           <Game
+          controlMode={this.state.controlMode}
           difficulty={this.state.difficulty}  // передача сложности в игру
           chess={this.state.chess}
           gameState={this.state.gameState}

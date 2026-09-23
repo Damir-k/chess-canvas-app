@@ -7,7 +7,7 @@
 .command-shortcut { display: block; color: #b6c0b3; font-size: 12px; margin-bottom: 8px; }
 .command-phrase { display: block; color: #e6edce; font-size: 21px; font-weight: 600; }
 .command-desc { display: block; color: #b6c0b3; font-size: 12px; margin-top: 6px; line-height: 1.5; }
-.help-footer { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid #3b463c; color: #b6c0b3; font-size: 12px; line-height: 1.6; }
+.help-footer { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid #3b463c; color: #b6c0b3; font-size: 12px; line-height: 1.6; white-space: pre-line; }
 @media (orientation: portrait), (max-width: 900px) {
   .help-sidebar { width: min(100%, 880px); margin-inline: auto; }
   .command-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }

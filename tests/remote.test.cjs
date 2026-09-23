@@ -155,3 +155,84 @@ test('a complete game reaches checkmate and the result, then resets', () => {
   app.reset_game(); assert.equal(app.state.gameState, 'in-progress');
   assert.equal(app.state.showDifficultyModal, true);
 });
+
+test('help renders appropriate instructions for every documented surface', () => {
+  const { renderToStaticMarkup } = require('react-dom/server');
+  const { detectControlMode } = load('src/controlInstructions.js');
+  const HelpSidebar = load('src/components/HelpSidebar/HelpSidebar.jsx').default;
+  const surfaces = {
+    SBERBOX: 'tv', TV: 'tv', TV_HUAWEI: 'tv', TIME: 'tv', SATELLITE: 'tv',
+    SBOL: 'mobile', COMPANION: 'mobile', STARGATE: 'mobile',
+    SBERBOOM: 'unknown', SBERBOOM_MINI: 'unknown', FUTURE_SURFACE: 'unknown',
+  };
+  for (const [surface, expected] of Object.entries(surfaces)) {
+    const controlMode = detectControlMode(surface, { navigator: { userAgent: 'iPhone' } });
+    assert.equal(controlMode, expected, surface);
+    const html = renderToStaticMarkup(React.createElement(HelpSidebar, { controlMode }));
+    const instructions = html.match(/id="remote-help">([^<]+)/)[1];
+    if (expected === 'tv') {
+      assert.match(instructions, /стрелками.*OK.*Назад/);
+      assert.doesNotMatch(instructions, /мыш|касани|клавиатур|Enter|Escape/i);
+    } else if (expected === 'mobile') {
+      assert.match(instructions, /Коснитесь/);
+      assert.doesNotMatch(instructions, /пульт|мыш|Enter|Escape|клавиатур/i);
+    } else assert.doesNotMatch(instructions, /пульт|мыш|касани|Enter|Escape|клавиатур|OK/i);
+  }
+  const desktop = renderToStaticMarkup(React.createElement(HelpSidebar, { controlMode: 'desktop' }));
+  assert.match(desktop, /Мышью/); assert.match(desktop, /Enter/); assert.match(desktop, /Escape/);
+  assert.doesNotMatch(desktop, /Пульт:|Коснитесь/);
+});
+
+test('browser fallback distinguishes TV, phones, tablets, touch PCs and unknown devices', () => {
+  const { detectControlMode } = load('src/controlInstructions.js');
+  const cases = [
+    ['Mozilla Android SmartTV Mobile', ['(pointer: coarse)'], 10, 'tv'],
+    ['SberBox', [], 0, 'tv'],
+    ['iPhone', ['(pointer: coarse)'], 5, 'mobile'],
+    ['Android Mobile', ['(pointer: coarse)'], 5, 'mobile'],
+    ['Android Tablet', ['(pointer: coarse)'], 5, 'mobile'],
+    ['Macintosh', ['(pointer: coarse)'], 5, 'mobile'],
+    ['Windows NT 10.0', ['(pointer: fine)', '(hover: hover)'], 10, 'desktop'],
+    ['Macintosh', ['(pointer: fine)', '(hover: hover)'], 0, 'desktop'],
+    ['X11; Linux x86_64', ['(pointer: fine)', '(hover: hover)'], 0, 'desktop'],
+    ['Unknown touch display', ['(pointer: coarse)'], 10, 'unknown'],
+    ['Android', [], 0, 'unknown'],
+    ['', [], 0, 'unknown'],
+  ];
+  for (const [userAgent, media, maxTouchPoints, expected] of cases) {
+    const browser = { navigator: { userAgent, maxTouchPoints }, matchMedia: q => ({ matches: media.includes(q) }) };
+    assert.equal(detectControlMode('', browser), expected, userAgent);
+    assert.equal(detectControlMode('TV', browser), 'tv', 'SDK takes priority');
+  }
+  assert.equal(detectControlMode('', {}), 'unknown');
+  assert.equal(detectControlMode('', { navigator: { userAgentData: { mobile: true } } }), 'mobile');
+});
+
+test('surface metadata works in RUN_APP, initial SDK data and later events', () => {
+  const { surfaceFromMessage } = load('src/controlInstructions.js');
+  for (const message of [
+    { messageName: 'RUN_APP', payload: { device: { surface: 'TV' } } },
+    { device: { surface: ' tv ' } },
+    { type: 'smart_app_data', smart_app_data: { device: { surface: 'TV' } } },
+    { type: 'smart_app_data', smart_app_data: { payload: { device: { surface: 'TV' } } } },
+  ]) assert.equal(surfaceFromMessage(message), 'TV');
+  for (const message of [null, {}, { device: { surface: 1 } }, { payload: { device: null } }]) {
+    assert.equal(surfaceFromMessage(message), '');
+  }
+  const handlers = {};
+  const assistant = { on: (name, fn) => { handlers[name] = fn; },
+    getInitialData: () => [{ type: 'smart_app_data', smart_app_data: { device: { surface: 'TIME' } } }] };
+  const { App } = load('src/App.jsx', {}, {
+    require: name => name === '@salutejs/client' ? { createAssistant: () => assistant } :
+      name === 'react-chessboard' ? { Chessboard: 'Chessboard' } : require(name),
+  });
+  const app = new App({}); app.setState = update => Object.assign(app.state, update);
+  handlers.start(); assert.equal(app.state.controlMode, 'tv');
+  handlers.data({ type: 'character' }); assert.equal(app.state.controlMode, 'tv');
+  handlers.data({ type: 'smart_app_data', device: { surface: 'COMPANION' } });
+  assert.equal(app.state.controlMode, 'mobile');
+  handlers.command({ payload: { device: { surface: 'TV_HUAWEI' } } });
+  assert.equal(app.state.controlMode, 'tv');
+  app.state.showDifficultyModal = false;
+  assert.equal(app.render().props.children[1].props.controlMode, 'tv');
+});

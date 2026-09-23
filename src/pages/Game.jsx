@@ -9,7 +9,7 @@ import { useRemoteBack } from '../useRemoteBack';
 
 const difficultyLabels = { easy: 'Лёгкая', medium: 'Средняя', hard: 'Сложная' };
 
-export const Game = ({ onMoveMade, chess, onUndoMove, onGameReset, difficulty, gameState, onGameOverChoice }) => {
+export const Game = ({ onMoveMade, chess, onUndoMove, onGameReset, difficulty, gameState, onGameOverChoice, controlMode }) => {
   useRemoteBack(!['in-progress', 'viewing-game'].includes(gameState), () => onGameOverChoice('return'));
   const status = chess.isGameOver() ? 'Партия завершена' : chess.turn() === 'w'
     ? (chess.isCheck() ? 'Вам шах · ваш ход' : 'Ваш ход') : 'Ход Салюта';
@@ -48,7 +48,7 @@ export const Game = ({ onMoveMade, chess, onUndoMove, onGameReset, difficulty, g
             <ResetGame chess={chess} onGameReset={onGameReset} />
           </div>
         </section>
-        <HelpSidebar />
+        <HelpSidebar controlMode={controlMode} />
       </div>
     </main>
   );
