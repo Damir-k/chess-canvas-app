@@ -31,11 +31,11 @@ const initializeChessMatch = (fen=DEFAULT_POSITION) => {
   let today = new Date()
 
   chess.setHeader('Event', 'Онлайн игра')
-  chess.setHeader('Site', 'SmartApp приложение Салют')
+  chess.setHeader('Site', 'SmartApp приложение')
   chess.setHeader('Date', `${today.getFullYear()}.${today.getMonth()}.${today.getDate()}`)
   chess.setHeader('Round', '-')
   chess.setHeader('White', 'Пользователь')
-  chess.setHeader('Black', 'Салют')
+  chess.setHeader('Black', 'Бот')
 
   return chess;
 }
