@@ -7,9 +7,9 @@ const { buildSync } = require('esbuild');
 const React = require('react');
 const { Chess } = require('chess.js');
 
-function load(entry, hooks = {}, globals = {}) {
+function load(entry, hooks = {}, globals = {}, env = {}) {
   const code = buildSync({ entryPoints: [entry], bundle: true, write: false,
-    platform: 'node', format: 'cjs', packages: 'external', define: { 'import.meta.env': '{}' }, loader: { '.css': 'empty' } }).outputFiles[0].text;
+    platform: 'node', format: 'cjs', packages: 'external', define: { 'import.meta.env': JSON.stringify(env) }, loader: { '.css': 'empty' } }).outputFiles[0].text;
   const module = { exports: {} };
   vm.runInNewContext(code, { module, exports: module.exports, console,
     require: name => name === 'react' ? { ...React, ...hooks } :
@@ -18,6 +18,30 @@ function load(entry, hooks = {}, globals = {}) {
     ...globals });
   return module.exports;
 }
+test('local Salute starts by default with credentials and skips incomplete configuration', () => {
+  let calls = [];
+  const assistant = { on() {} };
+  const globals = { require: name => name === '@salutejs/client' ? {
+    createSmartappDebugger: options => { calls.push(options); return assistant; },
+    createAssistant: () => { throw new Error('Unexpected native assistant in development'); },
+  } : name === 'react-chessboard' ? { Chessboard: 'Chessboard' } : require(name) };
+  for (const config of [{} ,
+    { VITE_APP_TOKEN: ' ', VITE_APP_SMARTAPP: 'Chess' },
+    { VITE_APP_TOKEN: 'token' }]) {
+    const { App } = load('src/App.jsx', {}, globals, { MODE: 'development', ...config });
+    const app = new App({});
+    assert.equal(app.assistant, null);
+    assert.doesNotThrow(() => app.say_phrase('Hello'));
+  }
+  assert.equal(calls.length, 0);
+  const { App } = load('src/App.jsx', {}, globals, { MODE: 'development',
+    VITE_APP_TOKEN: ' token ', VITE_APP_SMARTAPP: ' Chess ' });
+  assert.equal(new App({}).assistant, assistant);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].token, 'token');
+  assert.equal(calls[0].initPhrase, 'Запусти Chess');
+});
+
 function event(key, target, repeat = false) {
   return { key, target, repeat, defaultPrevented: false,
     preventDefault() { this.defaultPrevented = true; }, stopPropagation() {} };

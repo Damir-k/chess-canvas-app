@@ -1,54 +1,64 @@
-import React, { act } from 'react';
-import { createAssistant, createSmartappDebugger } from '@salutejs/client';
+import React, { act } from "react";
+import { createAssistant, createSmartappDebugger } from "@salutejs/client";
 
-import './App.css';
-import { Game } from './pages/Game';
-import { Chess, DEFAULT_POSITION } from 'chess.js'
-import { StockfishInterface } from './stockfishInterface'
-import { DifficultyModal } from './components/DifficultyModal';
-import { detectControlMode, surfaceFromMessage } from './controlInstructions';
+import "./App.css";
+import { Game } from "./pages/game";
+import { Chess, DEFAULT_POSITION } from "chess.js";
+import { StockfishInterface } from "./stockfishInterface";
+import { DifficultyModal } from "./components/DifficultyModal";
+import { detectControlMode, surfaceFromMessage } from "./controlInstructions";
 
 const initializeAssistant = (getState /*: any*/, getRecoveryState) => {
-  if (import.meta.env.MODE === 'development') {
+  if (import.meta.env.MODE === "development") {
+    const token = import.meta.env.VITE_APP_TOKEN?.trim();
+    const smartapp = import.meta.env.VITE_APP_SMARTAPP?.trim();
+    if (!token || !smartapp) {
+      console.warn("Salute: задайте VITE_APP_TOKEN и VITE_APP_SMARTAPP в .env и перезапустите сервер.");
+      return null;
+    }
+
     return createSmartappDebugger({
-      token: import.meta.env.VITE_APP_TOKEN ?? '',
-      initPhrase: `Запусти ${import.meta.env.VITE_APP_SMARTAPP}`,
-      getState,                                           
-      // getRecoveryState: getState,                                           
+      token,
+      initPhrase: `Запусим ${smartapp}`,
+      getState,
+      // getRecoveryState: getState,
       nativePanel: {
-        defaultText: 'Говорите!',
+        defaultText: "Говорите!",
         screenshotMode: false,
         tabIndex: -1,
-    },
+      },
     });
   } else {
-  return createAssistant({ getState });
+    return createAssistant({ getState });
   }
 };
 
-const initializeChessMatch = (fen=DEFAULT_POSITION) => {
-  let chess = new Chess(fen)
-  let today = new Date()
+const initializeChessMatch = (fen = DEFAULT_POSITION) => {
+  let chess = new Chess(fen);
+  let today = new Date();
 
-  chess.setHeader('Event', 'Онлайн игра')
-  chess.setHeader('Site', 'SmartApp приложение')
-  chess.setHeader('Date', `${today.getFullYear()}.${today.getMonth()}.${today.getDate()}`)
-  chess.setHeader('Round', '-')
-  chess.setHeader('White', 'Пользователь')
-  chess.setHeader('Black', 'Бот')
+  chess.setHeader("Event", "Онлайн игра");
+  chess.setHeader("Site", "SmartApp приложение");
+  chess.setHeader(
+    "Date",
+    `${today.getFullYear()}.${today.getMonth()}.${today.getDate()}`,
+  );
+  chess.setHeader("Round", "-");
+  chess.setHeader("White", "Пользователь");
+  chess.setHeader("Black", "Бот");
 
   return chess;
-}
+};
 
 async function postChessApi(data = {}) {
-    const response = await fetch("https://chess-api.com/v1", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data),
-    });
-    return response.json();
+  const response = await fetch("https://chess-api.com/v1", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  return response.json();
 }
 
 export class App extends React.Component {
@@ -56,25 +66,31 @@ export class App extends React.Component {
     super(props);
     // console.log('constructor');
     this.state = {
-      notes: [{ id: Math.random().toString(36).substring(7), title: 'тест', completed: false }],
+      notes: [
+        {
+          id: Math.random().toString(36).substring(7),
+          title: "тест",
+          completed: false,
+        },
+      ],
       chess: initializeChessMatch(),
       stockfish: null,
       // отображение окна выбора сложности (по ум. тру)
       showDifficultyModal: true,
-      // сложность по умолчанию   
-      difficulty: 'medium',     
+      // сложность по умолчанию
+      difficulty: "medium",
       gameState: "in-progress",
       controlMode: detectControlMode(),
     };
 
     this.assistant = initializeAssistant(() => this.getStateForAssistant());
 
-    this.assistant.on('data', (event /*: any*/) => {
+    this.assistant?.on("data", (event /*: any*/) => {
       this.updateControlSurface(event);
       // console.log(`assistant.on(data)`, event);
-      if (event.type === 'character') {
+      if (event.type === "character") {
         // console.log(`assistant.on(data): character: "${event?.character?.id}"`);
-      } else if (event.type === 'insets') {
+      } else if (event.type === "insets") {
         // console.log(`assistant.on(data): insets`);
       } else {
         const { action } = event;
@@ -82,39 +98,42 @@ export class App extends React.Component {
       }
     });
 
-    this.assistant.on('start', (event) => {
+    this.assistant?.on("start", (event) => {
       let initialData = this.assistant.getInitialData();
-      if (Array.isArray(initialData)) initialData.forEach(message => this.updateControlSurface(message));
+      if (Array.isArray(initialData))
+        initialData.forEach((message) => this.updateControlSurface(message));
       this.updateControlSurface(event);
 
       // console.log(`assistant.on(start)`, event, initialData);
     });
 
-    this.assistant.on('command', (event) => {
+    this.assistant?.on("command", (event) => {
       this.updateControlSurface(event);
       // console.log(`assistant.on(command)`, event);
     });
 
-    this.assistant.on('error', (event) => {
+    this.assistant?.on("error", (event) => {
       console.log(`assistant.on(error)`, event);
     });
 
-    this.assistant.on('tts', (event) => {
+    this.assistant?.on("tts", (event) => {
       // console.log(`assistant.on(tts)`, event);
     });
   }
 
   async componentDidMount() {
-      try {
-        this.state.stockfish = new StockfishInterface();
-        await this.state.stockfish.init();
-        this.state.stockfish.setSkillLevel({ easy: 0, medium: 10, hard: 20 }[this.state.difficulty]);
-        this.setState({ stockfishReady: true });
-      } catch (error) {
-        console.error('Stockfish initialization failed', error);
-        this.setState({ engineError: true });
-      }
+    try {
+      this.state.stockfish = new StockfishInterface();
+      await this.state.stockfish.init();
+      this.state.stockfish.setSkillLevel(
+        { easy: 0, medium: 10, hard: 20 }[this.state.difficulty],
+      );
+      this.setState({ stockfishReady: true });
+    } catch (error) {
+      console.error("Stockfish initialization failed", error);
+      this.setState({ engineError: true });
     }
+  }
 
   updateControlSurface(message) {
     const surface = surfaceFromMessage(message);
@@ -127,16 +146,17 @@ export class App extends React.Component {
     if (level === "hard") this.state.stockfish.setSkillLevel(20);
     if (level === "medium") this.state.stockfish.setSkillLevel(10);
     if (level === "easy") this.state.stockfish.setSkillLevel(0);
-    console.log('Выбрана сложность:', level);
-    this.setState({ 
+    console.log("Выбрана сложность:", level);
+    this.setState({
       difficulty: level,
-      showDifficultyModal: false 
+      showDifficultyModal: false,
     });
-    // сообщает выбранный уровень сложности 
+    // сообщает выбранный уровень сложности
     // по значению переменной level
-    this.say_phrase(`Играем на ${level === 'easy' ? 'легком' : level === 'medium' ? 'среднем' : 'сложном'} уровне`);
-  }
-
+    this.say_phrase(
+      `Играем на ${level === "easy" ? "легком" : level === "medium" ? "среднем" : "сложном"} уровне`,
+    );
+  };
 
   getStateForAssistant() {
     // console.log('getStateForAssistant: this.state:', this.state);
@@ -163,26 +183,27 @@ export class App extends React.Component {
     // console.log('dispatchAssistantAction', action);
     if (action) {
       switch (action.type) {
-        case 'reset_game':
-          return this.reset_game()
-        
-        case 'undo_move':
-          return this.handle_undo_move_attempt()
+        case "reset_game":
+          return this.reset_game();
 
-        case 'make_move':
-          return this.handle_make_move_attempt(action.move)
-        // НОВЫЙ e2e4 СВЕЖИЙ НЕРАЗДЕЛАННЫЙ 
-        case 'e2e4_move':
-          return this.handle_make_e2e4_attempt(action.move)
-        case 'difficulty_select':
-          return this.handleDifficultySelect(action.difficulty)
+        case "undo_move":
+          return this.handle_undo_move_attempt();
+
+        case "make_move":
+          return this.handle_make_move_attempt(action.move);
+        // НОВЫЙ e2e4 СВЕЖИЙ НЕРАЗДЕЛАННЫЙ
+        case "e2e4_move":
+          return this.handle_make_e2e4_attempt(action.move);
+        case "difficulty_select":
+          return this.handleDifficultySelect(action.difficulty);
         default:
-          console.error("unknown action type:", action.type)
+          console.error("unknown action type:", action.type);
       }
     }
   }
 
   _send_action_value(action_id, value) {
+    if (!this.assistant) return;
     const data = {
       action: {
         action_id: action_id,
@@ -195,7 +216,7 @@ export class App extends React.Component {
     const unsubscribe = this.assistant.sendData(data, (data) => {
       // функция, вызываемая, если на sendData() был отправлен ответ
       const { type, payload } = data;
-      console.log('sendData onData:', type, payload);
+      console.log("sendData onData:", type, payload);
       unsubscribe();
     });
   }
@@ -203,100 +224,116 @@ export class App extends React.Component {
   play_done_note(id) {
     const completed = this.state.notes.find(({ id }) => id)?.completed;
     if (!completed) {
-      const texts = ['Молодец!', 'Красавица!', 'Супер!'];
+      const texts = ["Молодец!", "Красавица!", "Супер!"];
       const idx = Math.floor(Math.random() * texts.length);
-      this._send_action_value('done', texts[idx]);
+      this._send_action_value("done", texts[idx]);
     }
   }
 
   handle_undo_move_attempt() {
-    if(this.take_back()) {
-      this.say_phrase("Возвращаю Ваш ход.")
+    if (this.take_back()) {
+      this.say_phrase("Возвращаю Ваш ход.");
     } else {
       setTimeout(() => {
-        if(this.take_back()) {
-          this.say_phrase("Возвращаю Ваш ход.")
+        if (this.take_back()) {
+          this.say_phrase("Возвращаю Ваш ход.");
         } else {
-          this.say_phrase("Вернуть ход не получилось.")
-        }  
-      }, 500)
+          this.say_phrase("Вернуть ход не получилось.");
+        }
+      }, 500);
     }
   }
-
 
   // пишем обработчик для хода в формате e2-e4
   handle_make_e2e4_attempt(move) {
     // принимаем координаты "откуда" и "куда"
     const { parseTree, fileFrom, rankFrom, fileTo, rankTo } = move;
-  
-    console.log("make_move: ", parseTree)
-    
-    console.info("FileFrom:", fileFrom, "RankFrom", rankFrom,
-       "FileTo", fileTo, "RankTo", rankTo)
 
-    let sourceSquare = fileFrom + rankFrom
-    let targetSquare = fileTo + rankTo
+    console.log("make_move: ", parseTree);
+
+    console.info(
+      "FileFrom:",
+      fileFrom,
+      "RankFrom",
+      rankFrom,
+      "FileTo",
+      fileTo,
+      "RankTo",
+      rankTo,
+    );
+
+    let sourceSquare = fileFrom + rankFrom;
+    let targetSquare = fileTo + rankTo;
 
     // Пример:
     // "e2" + " -" + "e4"
-    const parsedMove = sourceSquare + '-' + targetSquare
+    const parsedMove = sourceSquare + "-" + targetSquare;
 
-    return this.make_move(parsedMove) || console.warn(parsedMove, "failed")
+    return this.make_move(parsedMove) || console.warn(parsedMove, "failed");
   }
 
-  
   handle_make_move_attempt(move) {
     const { parseTree, piece, file, rank } = move;
     // console.log("make_move: ", parseTree)
-    console.info("Piece:", piece, "file:", file, "rank:", rank)
+    console.info("Piece:", piece, "file:", file, "rank:", rank);
 
-    let targetSquare = file + rank
-    if (piece === undefined || piece === 'Пешка') { // ход пешкой вперёд
-      console.info("Ход пешкой вперёд:", targetSquare)
-      return this.make_move(targetSquare) || console.warn(targetSquare, "failed")
+    let targetSquare = file + rank;
+    if (piece === undefined || piece === "Пешка") {
+      // ход пешкой вперёд
+      console.info("Ход пешкой вперёд:", targetSquare);
+      return (
+        this.make_move(targetSquare) || console.warn(targetSquare, "failed")
+      );
     }
     let attackingPiece;
-    if (piece === 'Конь') attackingPiece = 'N';
-    if (piece === 'Король') attackingPiece = 'K';
-    if (piece === 'Слон') attackingPiece = 'B';
-    if (piece === 'Ладья') attackingPiece = 'R';
-    if (piece === 'Ферзь') attackingPiece = 'Q';
+    if (piece === "Конь") attackingPiece = "N";
+    if (piece === "Король") attackingPiece = "K";
+    if (piece === "Слон") attackingPiece = "B";
+    if (piece === "Ладья") attackingPiece = "R";
+    if (piece === "Ферзь") attackingPiece = "Q";
 
-    const parsedMove = attackingPiece + targetSquare
-    return this.make_move(parsedMove) || console.warn(parsedMove, "failed")
+    const parsedMove = attackingPiece + targetSquare;
+    return this.make_move(parsedMove) || console.warn(parsedMove, "failed");
   }
 
   say_phrase(phrase) {
-    this._send_action_value('say_phrase', phrase)
+    this._send_action_value("say_phrase", phrase);
   }
 
   // When modifying Chess object in any way, create a new clone first so React notices
   update_chess() {
-    const newChess = initializeChessMatch(this.state.chess.fen())
-    newChess.loadPgn(this.state.chess.pgn())
-    this.setState({ chess: newChess })
-    return newChess
+    const newChess = initializeChessMatch(this.state.chess.fen());
+    newChess.loadPgn(this.state.chess.pgn());
+    this.setState({ chess: newChess });
+    return newChess;
   }
 
   show_result(chess) {
-    console.log(chess)
+    console.log(chess);
     if (chess.isCheckmate()) {
-      if (chess.turn() === 'w') {
+      if (chess.turn() === "w") {
         // alert("Black won!")
-        this.setState({ gameState: "player-lost" })
-        this.say_phrase("В этот раз я победитель. Хорошая игра!")
+        this.setState({ gameState: "player-lost" });
+        this.say_phrase("В этот раз я победитель. Хорошая игра!");
       } else {
         // alert("White won!")
-        this.setState({ gameState: "player-won" })
-        this.say_phrase("Поздравляю! Вы меня победили!")
+        this.setState({ gameState: "player-won" });
+        this.say_phrase("Поздравляю! Вы меня победили!");
       }
-    } else if (chess.isDraw() || chess.isDrawByFiftyMoves() || chess.isStalemate() || 
-    chess.isInsufficientMaterial() || chess.isThreefoldRepetition()) {
+    } else if (
+      chess.isDraw() ||
+      chess.isDrawByFiftyMoves() ||
+      chess.isStalemate() ||
+      chess.isInsufficientMaterial() ||
+      chess.isThreefoldRepetition()
+    ) {
       // alert("It's a draw!")
-      this.setState( {gameState: "tie"} )
-      this.say_phrase("Кажется игра закончилась ничьёй. Спасибо за игру!")
+      this.setState({ gameState: "tie" });
+      this.say_phrase("Кажется игра закончилась ничьёй. Спасибо за игру!");
     } else {
-      this.say_phrase("Что-то пошло не так. Пожалуйста, перезагрузите приложение.")
+      this.say_phrase(
+        "Что-то пошло не так. Пожалуйста, перезагрузите приложение.",
+      );
     }
   }
 
@@ -307,42 +344,49 @@ export class App extends React.Component {
     try {
       newChess.move(move);
     } catch {
-      return false
+      return false;
     }
     this.setState({ chess: newChess });
 
     if (newChess.isGameOver()) {
       this.resultTimer = setTimeout(() => {
         if (this.state.chess === newChess) this.show_result(newChess);
-      }, 1000)
-      return true
+      }, 1000);
+      return true;
     }
 
-    if (newChess.turn() === 'b') {
-      let previous_moves = newChess.history()
+    if (newChess.turn() === "b") {
+      let previous_moves = newChess.history();
       console.log(previous_moves);
       const engine = this.state.stockfish;
-      const onBestmove = line => {
+      const onBestmove = (line) => {
         const match = /^bestmove (\S+)/.exec(line);
         if (!match) return;
         engine.removeListener(onBestmove);
         this.pendingEngineListener = null;
-        if (this.state.chess === newChess && match[1] !== '(none)') this.make_move(match[1]);
+        if (this.state.chess === newChess && match[1] !== "(none)")
+          this.make_move(match[1]);
       };
       this.pendingEngineListener = onBestmove;
       engine.addListener(onBestmove);
       engine.setPosition(newChess.fen());
-      
-
     }
-    return true
+    return true;
   }
 
   take_back() {
-    if (this.state.chess.turn() !== 'w' || this.state.chess.history().length < 2) return false;
-    const newChess = this.update_chess()
+    if (
+      this.state.chess.turn() !== "w" ||
+      this.state.chess.history().length < 2
+    )
+      return false;
+    const newChess = this.update_chess();
 
-    return newChess.turn() === 'w' && (newChess.undo() !== null && newChess.undo() !== null)
+    return (
+      newChess.turn() === "w" &&
+      newChess.undo() !== null &&
+      newChess.undo() !== null
+    );
   }
 
   reset_game() {
@@ -350,28 +394,32 @@ export class App extends React.Component {
     if (this.pendingEngineListener) {
       this.state.stockfish.removeListener(this.pendingEngineListener);
       this.pendingEngineListener = null;
-      this.state.stockfish.sendCommand('stop');
+      this.state.stockfish.sendCommand("stop");
     }
-    this.setState({gameState: "in-progress"})
-    const newChess = initializeChessMatch()
-    this.setState({ chess: newChess,
-      showDifficultyModal: true // показываем окно выбора сложности
-     })
-    
+    this.setState({ gameState: "in-progress" });
+    const newChess = initializeChessMatch();
+    this.setState({
+      chess: newChess,
+      showDifficultyModal: true, // показываем окно выбора сложности
+    });
   }
 
   handleTextInput(input) {
-    if (typeof input !== 'string') return this.make_move(input);
+    if (typeof input !== "string") return this.make_move(input);
     if (input.startsWith("pos:")) {
-      this.reset_game()
-      let newChess = this.update_chess()
-      switch(input.slice(4)) {
-        case 'w': newChess.load("k7/8/KQ6/8/8/8/8/8 w - - 0 1"); break;
-        case 'b': newChess.load("k7/pp4KR/r7/8/8/8/7q/5r1r w - - 0 1"); break;
+      this.reset_game();
+      let newChess = this.update_chess();
+      switch (input.slice(4)) {
+        case "w":
+          newChess.load("k7/8/KQ6/8/8/8/8/8 w - - 0 1");
+          break;
+        case "b":
+          newChess.load("k7/pp4KR/r7/8/8/8/7q/5r1r w - - 0 1");
+          break;
       }
       return true;
     }
-    return this.make_move(input)
+    return this.make_move(input);
   }
 
   componentWillUnmount() {
@@ -383,39 +431,38 @@ export class App extends React.Component {
     // console.log('render');
     return (
       <>
-        <DifficultyModal 
+        <DifficultyModal
           isOpen={this.state.showDifficultyModal}
           ready={Boolean(this.state.stockfishReady)}
           error={this.state.engineError}
           onSelect={this.handleDifficultySelect}
         />
-        
+
         {!this.state.showDifficultyModal && (
           <Game
-          controlMode={this.state.controlMode}
-          difficulty={this.state.difficulty}  // передача сложности в игру
-          chess={this.state.chess}
-          gameState={this.state.gameState}
-          onMoveMade={(input) => {
-            return this.handleTextInput(input)
-          }}
-          onUndoMove={() => {
-            return this.take_back()
-          }}
-          onGameReset={() => {
-            return this.reset_game()
-          }}
-          onGameOverChoice={(choice) => {
-            switch (choice) {
-              case "restart": 
-                return this.reset_game();
-              case "return": 
-                return this.setState( {gameState: "viewing-game"} )
-            }
-          }}
-        />
+            controlMode={this.state.controlMode}
+            difficulty={this.state.difficulty} // передача сложности в игру
+            chess={this.state.chess}
+            gameState={this.state.gameState}
+            onMoveMade={(input) => {
+              return this.handleTextInput(input);
+            }}
+            onUndoMove={() => {
+              return this.take_back();
+            }}
+            onGameReset={() => {
+              return this.reset_game();
+            }}
+            onGameOverChoice={(choice) => {
+              switch (choice) {
+                case "restart":
+                  return this.reset_game();
+                case "return":
+                  return this.setState({ gameState: "viewing-game" });
+              }
+            }}
+          />
         )}
-        
       </>
     );
   }

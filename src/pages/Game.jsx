@@ -12,14 +12,14 @@ const difficultyLabels = { easy: 'Лёгкая', medium: 'Средняя', hard:
 export const Game = ({ onMoveMade, chess, onUndoMove, onGameReset, difficulty, gameState, onGameOverChoice, controlMode }) => {
   useRemoteBack(!['in-progress', 'viewing-game'].includes(gameState), () => onGameOverChoice('return'));
   const status = chess.isGameOver() ? 'Партия завершена' : chess.turn() === 'w'
-    ? (chess.isCheck() ? 'Вам шах · ваш ход' : 'Ваш ход') : 'Ход Салюта';
+    ? (chess.isCheck() ? 'Вам шах · ваш ход' : 'Ваш ход') : 'Ход Бота';
   return (
     <main className="container">
       <GameOverModal gameState={gameState} onGameOverChoice={onGameOverChoice} difficulty={difficulty} />
       <header className="game-header">
         <div className="game-brand">
           <span className="brand-piece" aria-hidden="true">♞</span>
-          <div><p className="eyebrow">ИГРА С АССИСТЕНТОМ</p><h1>Шахматы с Салютом</h1></div>
+          <div><p className="eyebrow">ИГРА С БОТОМ</p><h1>Голосовые шахматы</h1></div>
         </div>
         <span className={`difficulty-mark difficulty-${difficulty}`}>
           <span className="difficulty-dot" aria-hidden="true" />
@@ -29,7 +29,7 @@ export const Game = ({ onMoveMade, chess, onUndoMove, onGameReset, difficulty, g
       <div className="game-layout">
         <section className="play-area" aria-label="Шахматная партия">
           <div className="player-row">
-            <div className="player-info"><span className="player-avatar" aria-hidden="true">С</span><div><strong>Салют</strong><span>Чёрные фигуры</span></div></div>
+            <div className="player-info"><span className="player-avatar" aria-hidden="true">С</span><div><strong>Бот</strong><span>Чёрные фигуры</span></div></div>
             <span className="turn-status" role="status">{status}</span>
           </div>
           <ChessboardComponent chess={chess} onMoveMade={onMoveMade} />
